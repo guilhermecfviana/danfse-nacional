@@ -9,9 +9,9 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>DANFSe - <?= $data['numero_nfse'] ?></title>
+    <title>DANFSe - <?php echo $data['numero_nfse']; ?></title>
     <style>
-        <?= $fontFacesCss ?>
+        <?php echo $fontFacesCss; ?>
 
         * {
             margin: 0;
@@ -62,13 +62,29 @@
             font-weight: bold;
             color: #000;
             display: block;
-            margin-bottom: 2pt;
+            margin-bottom: 0;
         }
 
         .value {
             font-size: 8pt;
             font-weight: normal;
             color: #000;
+        }
+
+        .single-line-ellipsis {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .compact-value {
+            font-size: 7pt;
+        }
+
+        .compact-nowrap-label {
+            white-space: nowrap;
+            font-size: 6.5pt;
         }
 
         .section-header {
@@ -147,7 +163,7 @@
         <tr>
             <td class="logo-cell">
                 <?php if ($logo): ?>
-                <img src="<?= htmlspecialchars($logo) ?>" alt="Logo" style="max-width: 130pt; max-height: 40pt;">
+                <img src="<?php echo htmlspecialchars($logo); ?>" alt="Logo" style="max-width: 130pt; max-height: 40pt;">
                 <?php endif; ?>
             </td>
             <td class="title-cell">
@@ -162,15 +178,15 @@
                 <table>
                     <tr>
                         <?php if ($municipality->logoDataUri): ?>
-                        <td><img style="height: 30pt; width: auto" src="<?= htmlspecialchars($municipality->logoDataUri) ?>" alt="Prefeitura" /></td>
+                        <td><img style="height: 30pt; width: auto" src="<?php echo htmlspecialchars($municipality->logoDataUri); ?>" alt="Prefeitura" /></td>
                         <?php endif; ?>
                         <td style="font-size: 7pt;">
-                            <?= htmlspecialchars($municipality->name) ?><br>
+                            <?php echo htmlspecialchars($municipality->name); ?><br>
                             <?php if ($municipality->department): ?>
-                            <?= htmlspecialchars($municipality->department) ?><br>
+                            <?php echo htmlspecialchars($municipality->department); ?><br>
                             <?php endif; ?>
                             <?php if ($municipality->email): ?>
-                            <?= htmlspecialchars($municipality->email) ?>
+                            <?php echo htmlspecialchars($municipality->email); ?>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -186,11 +202,11 @@
             <tr>
                 <td colspan="3">
                     <span class="label">Chave de Acesso da NFS-e</span>
-                    <span class="value"><?= $data['chave_acesso'] ?></span>
+                    <span class="value"><?php echo $data['chave_acesso']; ?></span>
                 </td>
                 <td style="width: 25%; position: relative;" rowspan="3">
                     <div class="qr-container">
-                        <img src="<?= htmlspecialchars($qrCode) ?>" alt="QR Code" style="width: 70px; height: 70px; display: block; margin: 0 auto;" />
+                        <img src="<?php echo htmlspecialchars($qrCode); ?>" alt="QR Code" style="width: 70px; height: 70px; display: block; margin: 0 auto;" />
                         <div style="font-size: 6pt; padding-top: 2pt; text-align: left; line-height: 1.2;">
                             A autenticidade desta NFS-e pode ser verificada pela leitura deste código QR ou pela consulta da chave de acesso no portal nacional da NFS-e
                         </div>
@@ -200,29 +216,29 @@
             <tr>
                 <td style="width: 25%;">
                     <span class="label">Número da NFS-e</span>
-                    <span class="value"><?= $data['numero_nfse'] ?></span>
+                    <span class="value"><?php echo $data['numero_nfse']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Competência da NFS-e</span>
-                    <span class="value"><?= $data['competencia'] ?></span>
+                    <span class="value"><?php echo $data['competencia']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Data e Hora da emissão da NFS-e</span>
-                    <span class="value"><?= $data['emissao_nfse'] ?></span>
+                    <span class="value"><?php echo $data['emissao_nfse']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td>
                     <span class="label">Número do DPS</span>
-                    <span class="value"><?= $data['numero_dps'] ?></span>
+                    <span class="value"><?php echo $data['numero_dps']; ?></span>
                 </td>
                 <td>
                     <span class="label">Série do DPS</span>
-                    <span class="value"><?= $data['serie_dps'] ?></span>
+                    <span class="value"><?php echo $data['serie_dps']; ?></span>
                 </td>
                 <td>
                     <span class="label">Data e Hora da emissão da DPS</span>
-                    <span class="value"><?= $data['emissao_dps'] ?></span>
+                    <span class="value"><?php echo $data['emissao_dps']; ?></span>
                 </td>
             </tr>
         </table>
@@ -238,49 +254,49 @@
                 </td>
                 <td style="width: 25%;">
                     <span class="label">CNPJ / CPF / NIF</span>
-                    <span class="value"><?= $data['emitente']['cnpj_cpf'] ?></span>
+                    <span class="value"><?php echo $data['emitente']['cnpj_cpf']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Inscrição Municipal</span>
-                    <span class="value"><?= $data['emitente']['im'] ?></span>
+                    <span class="value"><?php echo $data['emitente']['im']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Telefone</span>
-                    <span class="value"><?= $data['emitente']['telefone'] ?></span>
+                    <span class="value"><?php echo $data['emitente']['telefone']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
                     <span class="label">Nome / Nome Empresarial</span>
-                    <span class="value"><?= $data['emitente']['nome'] ?></span>
+                    <span class="value"><?php echo $data['emitente']['nome']; ?></span>
                 </td>
                 <td colspan="2">
                     <span class="label">E-mail</span>
-                    <span class="value"><?= $data['emitente']['email'] ?></span>
+                    <span class="value"><?php echo $data['emitente']['email']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
                     <span class="label">Endereço</span>
-                    <span class="value"><?= $data['emitente']['endereco'] ?></span>
+                    <span class="value"><?php echo $data['emitente']['endereco']; ?></span>
                 </td>
                 <td>
                     <span class="label">Município</span>
-                    <span class="value"><?= $data['emitente']['municipio'] ?></span>
+                    <span class="value"><?php echo $data['emitente']['municipio']; ?></span>
                 </td>
                 <td>
                     <span class="label">CEP</span>
-                    <span class="value"><?= $data['emitente']['cep'] ?></span>
+                    <span class="value"><?php echo $data['emitente']['cep']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
                     <span class="label">Simples Nacional na Data de Competência</span>
-                    <span class="value"><?= $data['emitente']['simples_nacional'] ?></span>
+                    <span class="value"><?php echo $data['emitente']['simples_nacional']; ?></span>
                 </td>
                 <td colspan="2">
                     <span class="label">Regime de Apuração Tributária pelo SN</span>
-                    <span class="value"><?= $data['emitente']['regime_sn'] ?></span>
+                    <span class="value"><?php echo $data['emitente']['regime_sn']; ?></span>
                 </td>
             </tr>
         </table>
@@ -295,39 +311,39 @@
                 </td>
                 <td style="width: 25%;">
                     <span class="label">CNPJ / CPF / NIF</span>
-                    <span class="value"><?= $data['tomador']['cnpj_cpf'] ?></span>
+                    <span class="value"><?php echo $data['tomador']['cnpj_cpf']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Inscrição Municipal</span>
-                    <span class="value"><?= $data['tomador']['im'] ?></span>
+                    <span class="value"><?php echo $data['tomador']['im']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Telefone</span>
-                    <span class="value"><?= $data['tomador']['telefone'] ?></span>
+                    <span class="value"><?php echo $data['tomador']['telefone']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td colspan="2" style="width: 50%;">
                     <span class="label">Nome / Nome Empresarial</span>
-                    <span class="value"><?= $data['tomador']['nome'] ?></span>
+                    <span class="value"><?php echo $data['tomador']['nome']; ?></span>
                 </td>
                 <td colspan="2" style="width: 50%;">
                     <span class="label">E-mail</span>
-                    <span class="value"><?= $data['tomador']['email'] ?></span>
+                    <span class="value"><?php echo $data['tomador']['email']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td colspan="2" style="width: 50%;">
                     <span class="label">Endereço</span>
-                    <span class="value"><?= $data['tomador']['endereco'] ?></span>
+                    <span class="value"><?php echo $data['tomador']['endereco']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Município</span>
-                    <span class="value"><?= $data['tomador']['municipio'] ?></span>
+                    <span class="value"><?php echo $data['tomador']['municipio']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">CEP</span>
-                    <span class="value"><?= $data['tomador']['cep'] ?></span>
+                    <span class="value"><?php echo $data['tomador']['cep']; ?></span>
                 </td>
             </tr>
         </table>
@@ -343,39 +359,39 @@
                 </td>
                 <td style="width: 25%;">
                     <span class="label">CNPJ / CPF</span>
-                    <span class="value"><?= $data['intermediario']['cnpj_cpf'] ?></span>
+                    <span class="value"><?php echo $data['intermediario']['cnpj_cpf']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Inscrição Municipal</span>
-                    <span class="value"><?= $data['intermediario']['im'] ?></span>
+                    <span class="value"><?php echo $data['intermediario']['im']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Telefone</span>
-                    <span class="value"><?= $data['intermediario']['telefone'] ?></span>
+                    <span class="value"><?php echo $data['intermediario']['telefone']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td colspan="2" style="width: 50%;">
                     <span class="label">Nome / Nome Empresarial</span>
-                    <span class="value"><?= $data['intermediario']['nome'] ?></span>
+                    <span class="value"><?php echo $data['intermediario']['nome']; ?></span>
                 </td>
                 <td colspan="2" style="width: 50%;">
                     <span class="label">E-mail</span>
-                    <span class="value"><?= $data['intermediario']['email'] ?></span>
+                    <span class="value"><?php echo $data['intermediario']['email']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td colspan="2" style="width: 50%;">
                     <span class="label">Endereço</span>
-                    <span class="value"><?= $data['intermediario']['endereco'] ?></span>
+                    <span class="value"><?php echo $data['intermediario']['endereco']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Município</span>
-                    <span class="value"><?= $data['intermediario']['municipio'] ?></span>
+                    <span class="value"><?php echo $data['intermediario']['municipio']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">CEP</span>
-                    <span class="value"><?= $data['intermediario']['cep'] ?></span>
+                    <span class="value"><?php echo $data['intermediario']['cep']; ?></span>
                 </td>
             </tr>
         </table>
@@ -397,25 +413,25 @@
             <tr>
                 <td style="width: 25%;">
                     <span class="label">Código de Tributação Nacional</span>
-                    <span class="value"><?= $data['servico']['codigo_trib_nacional'] ?> - <?= $data['servico']['desc_trib_nacional'] ?></span>
+                    <span class="value single-line-ellipsis compact-value"><?php echo $data['servico']['codigo_trib_nacional']; ?> - <?php echo $data['servico']['desc_trib_nacional']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Código de Tributação Municipal</span>
-                    <span class="value"><?= $data['servico']['codigo_trib_municipal'] ?> - <?= $data['servico']['desc_trib_municipal'] ?></span>
+                    <span class="value single-line-ellipsis compact-value"><?php echo $data['servico']['codigo_trib_municipal']; ?> <?php echo !empty($data['servico']['desc_trib_municipal']) ? '- ' . $data['servico']['desc_trib_municipal'] : ''; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Local da Prestação</span>
-                    <span class="value"><?= $data['servico']['local_prestacao'] ?></span>
+                    <span class="value"><?php echo $data['servico']['local_prestacao']; ?></span>
                 </td>
                 <td style="width: 25%;">
-                    <span class="label">País da Prestação</span>
-                    <span class="value"><?= $data['servico']['pais_prestacao'] ?></span>
+                    <span class="label compact-nowrap-label">País da Prestação</span>
+                    <span class="value single-line-ellipsis"><?php echo $data['servico']['pais_prestacao']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td colspan="4">
                     <span class="label">Descrição do Serviço</span>
-                    <span class="value"><?= $data['servico']['descricao'] ?></span>
+                    <span class="value"><?php echo $data['servico']['descricao']; ?></span>
                 </td>
             </tr>
         </table>
@@ -432,73 +448,73 @@
             <tr>
                 <td style="width: 25%;">
                     <span class="label">Tributação do ISSQN</span>
-                    <span class="value"><?= $data['tributacao_municipal']['tributacao_issqn'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['tributacao_issqn'] ?? '-'; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">País Resultado da Prestação do Serviço</span>
-                    <span class="value"><?= $data['tributacao_municipal']['pais_resultado'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['pais_resultado'] ?? '-'; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Município de Incidência do ISSQN</span>
-                    <span class="value"><?= $data['tributacao_municipal']['municipio_incidencia'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['municipio_incidencia'] ?? '-'; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Regime Especial de Tributação</span>
-                    <span class="value"><?= $data['tributacao_municipal']['regime_especial'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['regime_especial'] ?? '-'; ?></span>
                 </td>
             </tr>
             <tr>
                 <td>
                     <span class="label">Tipo de Imunidade</span>
-                    <span class="value"><?= $data['tributacao_municipal']['tipo_imunidade'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['tipo_imunidade'] ?? '-'; ?></span>
                 </td>
                 <td>
                     <span class="label">Suspensão da Exigibilidade do ISSQN</span>
-                    <span class="value"><?= $data['tributacao_municipal']['suspensao_exigibilidade'] ?? 'Não' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['suspensao_exigibilidade'] ?? 'Não'; ?></span>
                 </td>
                 <td>
                     <span class="label">Número Processo Suspensão</span>
-                    <span class="value"><?= $data['tributacao_municipal']['num_processo_suspensao'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['num_processo_suspensao'] ?? '-'; ?></span>
                 </td>
                 <td>
                     <span class="label">Benefício Municipal</span>
-                    <span class="value"><?= $data['tributacao_municipal']['beneficio_municipal'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['beneficio_municipal'] ?? '-'; ?></span>
                 </td>
             </tr>
             <tr>
                 <td>
                     <span class="label">Valor do Serviço</span>
-                    <span class="value"><?= $data['tributacao_municipal']['valor_servico'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['valor_servico'] ?? '-'; ?></span>
                 </td>
                 <td>
                     <span class="label">Desconto Incondicionado</span>
-                    <span class="value"><?= $data['tributacao_municipal']['desconto_incondicionado'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['desconto_incondicionado'] ?? '-'; ?></span>
                 </td>
                 <td>
                     <span class="label">Total Deduções/Reduções</span>
-                    <span class="value"><?= $data['tributacao_municipal']['total_deducoes'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['total_deducoes'] ?? '-'; ?></span>
                 </td>
                 <td>
                     <span class="label">Cálculo do BM</span>
-                    <span class="value"><?= $data['tributacao_municipal']['calculo_bm'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['calculo_bm'] ?? '-'; ?></span>
                 </td>
             </tr>
             <tr>
                 <td>
                     <span class="label">BC ISSQN</span>
-                    <span class="value"><?= $data['tributacao_municipal']['bc_issqn'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['bc_issqn'] ?? '-'; ?></span>
                 </td>
                 <td>
                     <span class="label">Alíquota Aplicada</span>
-                    <span class="value"><?= $data['tributacao_municipal']['aliquota'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['aliquota'] ?? '-'; ?></span>
                 </td>
                 <td>
                     <span class="label">Retenção do ISSQN</span>
-                    <span class="value"><?= $data['tributacao_municipal']['retencao_issqn'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['retencao_issqn'] ?? '-'; ?></span>
                 </td>
                 <td>
                     <span class="label">ISSQN Apurado</span>
-                    <span class="value"><?= $data['tributacao_municipal']['issqn_apurado'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_municipal']['issqn_apurado'] ?? '-'; ?></span>
                 </td>
             </tr>
         </table>
@@ -515,29 +531,29 @@
             <tr>
                 <td style="width: 25%;">
                     <span class="label">IRRF</span>
-                    <span class="value"><?= $data['tributacao_federal']['irrf'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_federal']['irrf'] ?? '-'; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Contribuição Previdenciária - Retida</span>
-                    <span class="value"><?= $data['tributacao_federal']['cp'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_federal']['cp'] ?? '-'; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Contribuições Sociais - Retidas</span>
-                    <span class="value"><?= $data['tributacao_federal']['contrib_sociais'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_federal']['contrib_sociais'] ?? '-'; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Descrição Contrib. Sociais - Retidas</span>
-                    <span class="value"><?= $data['tributacao_federal']['desc_contrib_sociais'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_federal']['desc_contrib_sociais'] ?? '-'; ?></span>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
                     <span class="label">PIS - Débito Apuração Própria</span>
-                    <span class="value"><?= $data['tributacao_federal']['pis'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_federal']['pis'] ?? '-'; ?></span>
                 </td>
                 <td colspan="2">
                     <span class="label">COFINS - Débito Apuração Própria</span>
-                    <span class="value"><?= $data['tributacao_federal']['cofins'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['tributacao_federal']['cofins'] ?? '-'; ?></span>
                 </td>
             </tr>
         </table>
@@ -554,33 +570,33 @@
             <tr>
                 <td style="width: 25%;">
                     <span class="label">Valor do Serviço</span>
-                    <span class="value"><?= $data['totais']['valor_servico'] ?></span>
+                    <span class="value"><?php echo $data['totais']['valor_servico']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Desconto Condicionado</span>
-                    <span class="value"><?= $data['totais']['desconto_condicionado'] ?></span>
+                    <span class="value"><?php echo $data['totais']['desconto_condicionado']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Desconto Incondicionado</span>
-                    <span class="value"><?= $data['totais']['desconto_incondicionado'] ?></span>
+                    <span class="value"><?php echo $data['totais']['desconto_incondicionado']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">ISSQN Retido</span>
-                    <span class="value"><?= $data['totais']['issqn_retido'] ?></span>
+                    <span class="value"><?php echo $data['totais']['issqn_retido']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td>
                     <span class="label">Total das Retenções Federais</span>
-                    <span class="value"><?= $data['totais']['retencoes_federais'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['totais']['retencoes_federais'] ?? '-'; ?></span>
                 </td>
                 <td colspan="2">
                     <span class="label">PIS/COFINS - Débito Apur. Própria</span>
-                    <span class="value"><?= $data['totais']['pis_cofins'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['totais']['pis_cofins'] ?? '-'; ?></span>
                 </td>
                 <td>
                     <span class="label">Valor Líquido da NFS-e</span>
-                    <span class="value" style="font-weight: bold;"><?= $data['totais']['valor_liquido'] ?></span>
+                    <span class="value" style="font-weight: bold;"><?php echo $data['totais']['valor_liquido']; ?></span>
                 </td>
             </tr>
         </table>
@@ -597,35 +613,38 @@
             <tr>
                 <td style="width: 33.33%; text-align: center;">
                     <span class="label">Federais</span>
-                    <span class="value"><?= $data['totais_tributos']['federais'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['totais_tributos']['federais'] ?? '-'; ?></span>
                 </td>
                 <td style="width: 33.33%; text-align: center;">
                     <span class="label">Estaduais</span>
-                    <span class="value"><?= $data['totais_tributos']['estaduais'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['totais_tributos']['estaduais'] ?? '-'; ?></span>
                 </td>
                 <td style="width: 33.33%; text-align: center;">
                     <span class="label">Municipais</span>
-                    <span class="value"><?= $data['totais_tributos']['municipais'] ?? '-' ?></span>
+                    <span class="value"><?php echo $data['totais_tributos']['municipais'] ?? '-'; ?></span>
                 </td>
             </tr>
         </table>
     </div>
 
     <!-- Informações Complementares -->
-    <div class="bordered-section">
-        <table>
-            <tr>
-                <td class="section-header">
-                  <span class="section-title">INFORMAÇÕES COMPLEMENTARES</span>
-                </td>
-            </tr>
-            <tr>
-                <td style="min-height: 30pt; padding: 5pt;">
-                    <span class="value"><?= $data['informacoes_complementares'] ?></span>
-                </td>
-            </tr>
-        </table>
-    </div>
+        <div class="bordered-section">
+            <table>
+                <tr>
+                    <td class="section-header">
+                      <span class="section-title">INFORMAÇÕES COMPLEMENTARES</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="min-height: 30pt; padding: 5pt;">
+                    <?php if (($data['nbs'] ?? '') !== ''): ?>
+                    <div class="value" style="margin-bottom: 3pt;"><strong>NBS:</strong> <?php echo $data['nbs']; ?></div>
+                    <?php endif; ?>
+                    <span class="value"><?php echo $data['informacoes_complementares'] !== '' ? $data['informacoes_complementares'] : ''; ?></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
 
 </body>
 </html>

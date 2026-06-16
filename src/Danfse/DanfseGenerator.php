@@ -181,7 +181,6 @@ class DanfseGenerator
             $fontMetrics = $dompdf->getFontMetrics();
             $font = $fontMetrics->getFont('Helvetica', 'normal');
             $fontSize = 7;
-            $fontHeight = $fontMetrics->getFontHeight($font, $fontSize);
             $textWidth = $fontMetrics->getTextWidth($footerText, $font, $fontSize);
             $pageWidth = $canvas->get_width();
             $pageHeight = $canvas->get_height();
@@ -189,8 +188,7 @@ class DanfseGenerator
             $x = max(14.0, $pageWidth - 14.0 - $textWidth);
             $y = $pageHeight - 10.0;
 
-            $canvas->text($x, $y, $footerText, $font, $fontSize, [0, 0, 0]);
-
+            $linkPos = null;
             if ($linkUrl !== null && $linkLabel !== null) {
                 $linkPos = strpos($footerText, $linkLabel);
                 if ($linkPos === false) {
@@ -199,14 +197,21 @@ class DanfseGenerator
                         $linkLabel = $linkUrl;
                     }
                 }
-                if ($linkPos !== false) {
-                    $prefix = substr($footerText, 0, $linkPos);
-                    $linkX = $x + $fontMetrics->getTextWidth($prefix, $font, $fontSize);
-                    $linkWidth = $fontMetrics->getTextWidth($linkLabel, $font, $fontSize);
-                    $canvas->add_link($linkUrl, $linkX, $y, $linkWidth, $fontHeight);
-                    $canvas->text($linkX, $y, $linkLabel, $font, $fontSize, [0, 0, 1]);
-                }
             }
+
+            $canvas->page_script(function (int $pageNumber, int $pageCount, $pageCanvas, $pageFontMetrics) use ($footerText, $font, $fontSize, $x, $y, $linkUrl, $linkLabel, $linkPos): void {
+                $pageCanvas->text($x, $y, $footerText, $font, $fontSize, [0, 0, 0]);
+
+                if ($linkUrl !== null && $linkLabel !== null && $linkPos !== false && $linkPos !== null) {
+                    $fontHeight = $pageFontMetrics->getFontHeight($font, $fontSize);
+                    $prefix = substr($footerText, 0, $linkPos);
+                    $linkX = $x + $pageFontMetrics->getTextWidth($prefix, $font, $fontSize);
+                    $linkWidth = $pageFontMetrics->getTextWidth($linkLabel, $font, $fontSize);
+
+                    $pageCanvas->add_link($linkUrl, $linkX, $y, $linkWidth, $fontHeight);
+                    $pageCanvas->text($linkX, $y, $linkLabel, $font, $fontSize, [0, 0, 1]);
+                }
+            });
         }
 
         return $dompdf->output();

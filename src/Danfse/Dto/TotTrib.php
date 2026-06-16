@@ -5,7 +5,8 @@ namespace GuilhermeViana\Nfsenacional\Danfse\Dto;
 readonly class TotTrib
 {
     public function __construct(
-        public string $vTotTrib = '',
+        /** @var string|array{vTotTribFed?: string, vTotTribEst?: string, vTotTribMun?: string} */
+        public string|array $vTotTrib = '',
         public ?TotTribPercent $pTotTrib = null,
         public string $indTotTrib = '',
         public string $pTotTribSN = '',

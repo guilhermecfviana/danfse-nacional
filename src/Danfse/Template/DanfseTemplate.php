@@ -112,6 +112,8 @@ class DanfseTemplate
         $tribMun = $trib?->tribMun;
         $tribFed = $trib?->tribFed;
         $totTrib = $trib?->totTrib;
+        $totTribPercent = $totTrib?->pTotTrib;
+        $totTribValues = is_array($totTrib?->vTotTrib ?? null) ? $totTrib->vTotTrib : null;
         $valoresNfse = $inf?->valores;
 
         // Chave de acesso (remove prefixo "NFS")
@@ -195,7 +197,7 @@ class DanfseTemplate
 
             'servico' => [
                 'codigo_trib_nacional' => $this->fmt->codTribNacional($cServ?->cTribNac ?? ''),
-                'desc_trib_nacional' => $this->fmt->limit(trim($inf?->xTribNac ?? ''), 60),
+                'desc_trib_nacional' => $this->fmt->limit(trim($inf?->xTribNac ?? ''), 40),
                 'codigo_trib_municipal' => $cServ?->cTribMun ?? '-',
                 'desc_trib_municipal' => $this->fmt->limit(trim($inf?->xTribMun ?? ''), 60),
                 'local_prestacao' => $inf?->xLocPrestacao ?? '-',
@@ -242,11 +244,18 @@ class DanfseTemplate
             ],
 
             'totais_tributos' => [
-                'federais' => $totTrib?->pTotTrib?->pTotTribFed ? $totTrib->pTotTrib->pTotTribFed . '%' : '-',
-                'estaduais' => $totTrib?->pTotTrib?->pTotTribEst ? $totTrib->pTotTrib->pTotTribEst . '%' : '-',
-                'municipais' => $totTrib?->pTotTrib?->pTotTribMun ? $totTrib->pTotTrib->pTotTribMun . '%' : '-',
+                'federais' => $totTribPercent?->pTotTribFed
+                    ? $totTribPercent->pTotTribFed . '%'
+                    : (($totTribValues['vTotTribFed'] ?? '') !== '' ? $this->fmt->currency((string) $totTribValues['vTotTribFed']) : '-'),
+                'estaduais' => $totTribPercent?->pTotTribEst
+                    ? $totTribPercent->pTotTribEst . '%'
+                    : (($totTribValues['vTotTribEst'] ?? '') !== '' ? $this->fmt->currency((string) $totTribValues['vTotTribEst']) : '-'),
+                'municipais' => $totTribPercent?->pTotTribMun
+                    ? $totTribPercent->pTotTribMun . '%'
+                    : (($totTribValues['vTotTribMun'] ?? '') !== '' ? $this->fmt->currency((string) $totTribValues['vTotTribMun']) : '-'),
             ],
 
+            'nbs' => trim((string) ($cServ?->cNBS ?? '')),
             'informacoes_complementares' => $serv?->infoCompl?->xInfComp ?? '',
         ];
     }
