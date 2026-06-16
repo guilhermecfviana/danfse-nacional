@@ -1,0 +1,42 @@
+{
+    "name": "guilhermecfviana/nfsenacional",
+    "description": "Projeto para gerar a DANFSe da NFSe Nacional do Brasil",
+    "keywords": ["nfse", "nfse nacional", "nfsenacional", "brasil", "nota fiscal eletrônica de serviço"],
+    "license": "MIT",
+    "homepage": "https://github.com/guilhermecfviana/nfsenacional",
+    "require": {
+        "php": ">=8.1",
+        "ext-dom": "*",
+        "ext-fileinfo": "*",
+        "ext-libxml": "*",
+        "ext-mbstring": "*",
+        "ext-simplexml": "*",
+        "dompdf/dompdf": "^3.0",
+        "cuyz/valinor": "^1.14",
+        "bacon/bacon-qr-code": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "GuilhermeViana\\Nfsenacional\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "GuilhermeViana\\Nfsenacional\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Guilherme Viana",
+            "email": "guilhermecfviana@gmail.com"
+        }
+    ],
+    "scripts": {
+        "test": "phpunit"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
