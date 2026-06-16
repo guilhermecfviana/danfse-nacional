@@ -30,7 +30,7 @@ Estamos gerando a versão 1.0 da DANFSe Nacional, em breve lançamento a versão
 ## Instalacao
 
 ```bash
-composer install
+composer install guilhermecfviana/nfsenacional
 ```
 
 ## Uso rapido
