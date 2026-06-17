@@ -214,14 +214,14 @@ class DanfseTemplate
                 'desc_trib_nacional' => $this->fmt->limit(trim($inf?->xTribNac ?? ''), 40),
                 'codigo_trib_municipal' => $cServ?->cTribMun ?? '-',
                 'desc_trib_municipal' => $this->fmt->limit(trim($inf?->xTribMun ?? ''), 60),
-                'local_prestacao' => $inf?->xLocPrestacao ?? '-',
+                'local_prestacao' => $locPrest?->cLocPrestacao ? Municipios::lookup($locPrest->cLocPrestacao) : ($inf?->xLocPrestacao ?? '-'),
                 'pais_prestacao' => $locPrest?->cPaisPrestacao ?? '-',
                 'descricao' => $cServ?->xDescServ ?? '-',
             ],
 
             'tributacao_municipal' => [
                 'tributacao_issqn' => TribISSQN::labelFor($tribMun?->tribISSQN ?? ''),
-                'municipio_incidencia' => $inf?->xLocIncid ?? '-',
+                'municipio_incidencia' => $inf?->cLocIncid ? Municipios::lookup($inf->cLocIncid) : ($inf?->xLocIncid ?? '-'),
                 'regime_especial' => RegEspTrib::labelFor($regTrib?->regEspTrib ?? ''),
                 'valor_servico' => $this->fmt->currency($vServPrest?->vServ ?? ''),
                 'bc_issqn' => ($tribMun?->vBC ?? '') !== ''
@@ -250,8 +250,8 @@ class DanfseTemplate
                 'valor_servico' => $this->fmt->currency($vServPrest?->vServ ?? ''),
                 'desconto_condicionado' => $tribMun?->vDescCond ? $this->fmt->currency($tribMun->vDescCond) : '-',
                 'desconto_incondicionado' => $tribMun?->vDescIncond ? $this->fmt->currency($tribMun->vDescIncond) : '-',
-                'issqn_retido' => ($tribMun?->vISSQN && ($tribMun?->tpRetISSQN ?? '1') !== '1')
-                    ? $this->fmt->currency($tribMun->vISSQN)
+                'issqn_retido' => (($tribMun?->vISSQN ?? '') !== '' || (($valoresNfse?->vISSQN ?? '') !== '')) && ($tribMun?->tpRetISSQN ?? '1') !== '1'
+                    ? $this->fmt->currency(($tribMun?->vISSQN ?? '') !== '' ? $tribMun->vISSQN : $valoresNfse->vISSQN)
                     : '-',
                 'retencoes_federais' => $this->sumCurrency(
                     $tribFed?->vRetIRRF ?? '',
@@ -302,16 +302,16 @@ class DanfseTemplate
     private function labelForTpRetPisCofins(string $tpRetPisCofins): string
     {
         return match (trim($tpRetPisCofins)) {
-            '0' => 'PIS/COFINS/CSLL Não Retidos',
-            '1' => 'PIS/COFINS Retido',
-            '2' => 'PIS/COFINS Não Retido',
-            '3' => 'PIS/COFINS/CSLL Retidos',
-            '4' => 'PIS/COFINS Retidos, CSLL Não Retido',
-            '5' => 'PIS Retido, COFINS/CSLL Não Retido',
-            '6' => 'COFINS Retido, PIS/CSLL Não Retido',
-            '7' => 'PIS Não Retido, COFINS/CSLL Retidos',
-            '8' => 'PIS/COFINS Não Retidos, CSLL Retido',
-            '9' => 'COFINS Não Retido, PIS/CSLL Retidos',
+            '0' => '0 - PIS/COFINS/CSLL Não Retidos',
+            '1' => '1 - PIS/COFINS Retido',
+            '2' => '2 - PIS/COFINS Não Retido',
+            '3' => '3 - PIS/COFINS/CSLL Retidos',
+            '4' => '4 - PIS/COFINS Retidos, CSLL Não Retido',
+            '5' => '5 - PIS Retido, COFINS/CSLL Não Retido',
+            '6' => '6 - COFINS Retido, PIS/CSLL Não Retido',
+            '7' => '7 - PIS Não Retido, COFINS/CSLL Retidos',
+            '8' => '8 - PIS/COFINS Não Retidos, CSLL Retido',
+            '9' => '9 - COFINS Não Retido, PIS/CSLL Retidos',
             default => '-',
         };
     }

@@ -235,16 +235,16 @@
                     </div>
                 </td>
             </tr>
-            <tr>
-                <td style="width: 25%;">
+            <tr style="padding-bottom: 5pt;">
+                <td style="width: 25%; padding-bottom: 8pt;">
                     <span class="label">Número da NFS-e</span>
                     <span class="value"><?php echo $data['numero_nfse']; ?></span>
                 </td>
-                <td style="width: 25%;">
+                <td style="width: 25%; padding-bottom: 8pt;">
                     <span class="label">Competência da NFS-e</span>
                     <span class="value"><?php echo $data['competencia']; ?></span>
                 </td>
-                <td style="width: 25%;">
+                <td style="width: 25%; padding-bottom: 8pt;">
                     <span class="label">Data e Hora da emissão da NFS-e</span>
                     <span class="value"><?php echo $data['emissao_nfse']; ?></span>
                 </td>
