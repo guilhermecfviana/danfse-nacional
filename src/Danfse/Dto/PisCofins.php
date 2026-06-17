@@ -6,6 +6,7 @@ readonly class PisCofins
 {
     public function __construct(
         public string $CST = '',
+        public string $tpRetPisCofins = '',
         public string $vBCPisCofins = '',
         public string $pAliqPis = '',
         public string $pAliqCofins = '',

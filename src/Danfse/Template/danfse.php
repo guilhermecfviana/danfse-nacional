@@ -229,10 +229,24 @@
                 <td style="width: 25%; position: relative;" rowspan="3">
                     <div class="qr-container">
                         <img src="<?php echo htmlspecialchars($qrCode); ?>" alt="QR Code" style="width: 70px; height: 70px; display: block; margin: 0 auto;" />
-                        <div style="font-size: 6pt; padding-top: 2pt; text-align: left; line-height: 1.2;">
+                        <div style="font-size: 6pt; padding-top: 2pt; text-align: left; line-height: 1.05;">
                             A autenticidade desta NFS-e pode ser verificada pela leitura deste código QR ou pela consulta da chave de acesso no portal nacional da NFS-e
                         </div>
                     </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 25%;">
+                    <span class="label">Número da NFS-e</span>
+                    <span class="value"><?php echo $data['numero_nfse']; ?></span>
+                </td>
+                <td style="width: 25%;">
+                    <span class="label">Competência da NFS-e</span>
+                    <span class="value"><?php echo $data['competencia']; ?></span>
+                </td>
+                <td style="width: 25%;">
+                    <span class="label">Data e Hora da emissão da NFS-e</span>
+                    <span class="value"><?php echo $data['emissao_nfse']; ?></span>
                 </td>
             </tr>
             <tr>
@@ -311,6 +325,7 @@
     </div>
 
     <!-- Tomador -->
+    <?php if ($data['tomador'] !== null): ?>
     <div class="bordered-section">
         <table>
             <tr>
@@ -356,6 +371,11 @@
             </tr>
         </table>
     </div>
+    <?php else: ?>
+    <div class="bordered-section" style="text-align: center; font-weight: normal; font-size: 7pt;">
+        TOMADOR DO SERVIÇO NÃO IDENTIFICADO NA NFS-e
+    </div>
+    <?php endif; ?>
 
     <!-- Intermediário -->
     <?php if ($data['intermediario'] !== null): ?>

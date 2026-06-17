@@ -187,16 +187,16 @@ class DanfseTemplate
                 'regime_sn' => RegApTribSN::labelFor($regTrib?->regApTribSN ?? ''),
             ],
 
-            'tomador' => [
-                'nome' => $toma?->xNome ?? '-',
-                'cnpj_cpf' => $this->fmt->cnpjCpf($toma?->documento() ?? ''),
-                'im' => $toma?->IM ?: '-',
-                'telefone' => $this->fmt->phone($toma?->fone ?? ''),
-                'email' => strtolower($toma?->email ?? ''),
+            'tomador' => $toma !== null ? [
+                'nome' => $toma->xNome ?: '-',
+                'cnpj_cpf' => $this->fmt->cnpjCpf($toma->documento()),
+                'im' => $toma->IM ?: '-',
+                'telefone' => $this->fmt->phone($toma->fone),
+                'email' => strtolower($toma->email),
                 'endereco' => $enderecoToma ?: '-',
                 'municipio' => $endToma?->endNac?->cMun ? Municipios::lookup($endToma->endNac->cMun) : '-',
                 'cep' => $this->fmt->cep($cepToma),
-            ],
+            ] : null,
 
             'intermediario' => $interm !== null ? [
                 'nome' => $interm->xNome ?: '-',
@@ -224,16 +224,24 @@ class DanfseTemplate
                 'municipio_incidencia' => $inf?->xLocIncid ?? '-',
                 'regime_especial' => RegEspTrib::labelFor($regTrib?->regEspTrib ?? ''),
                 'valor_servico' => $this->fmt->currency($vServPrest?->vServ ?? ''),
-                'bc_issqn' => $tribMun?->vBC ? $this->fmt->currency($tribMun->vBC) : '-',
-                'aliquota' => $tribMun?->pAliq ? $tribMun->pAliq . '%' : '-',
+                'bc_issqn' => ($tribMun?->vBC ?? '') !== ''
+                    ? $this->fmt->currency($tribMun->vBC)
+                    : ((($valoresNfse?->vBC ?? '') !== '') ? $this->fmt->currency($valoresNfse->vBC) : '-'),
+                'aliquota' => ($tribMun?->pAliq ?? '') !== ''
+                    ? $tribMun->pAliq . '%'
+                    : ((($valoresNfse?->pAliqAplic ?? '') !== '') ? $valoresNfse->pAliqAplic . '%' : '-'),
                 'retencao_issqn' => TpRetISSQN::labelFor($tribMun?->tpRetISSQN ?? ''),
-                'issqn_apurado' => $tribMun?->vISSQN ? $this->fmt->currency($tribMun->vISSQN) : '-',
+                'issqn_apurado' => ($tribMun?->vISSQN ?? '') !== ''
+                    ? $this->fmt->currency($tribMun->vISSQN)
+                    : ((($valoresNfse?->vISSQN ?? '') !== '') ? $this->fmt->currency($valoresNfse->vISSQN) : '-'),
             ],
 
             'tributacao_federal' => [
                 'irrf' => $tribFed?->vRetIRRF ? $this->fmt->currency($tribFed->vRetIRRF) : '-',
                 'cp' => $tribFed?->vRetCP ? $this->fmt->currency($tribFed->vRetCP) : '-',
                 'csll' => $tribFed?->vRetCSLL ? $this->fmt->currency($tribFed->vRetCSLL) : '-',
+                'contrib_sociais' => $tribFed?->vRetCSLL ? $this->fmt->currency($tribFed->vRetCSLL) : '-',
+                'desc_contrib_sociais' => $this->labelForTpRetPisCofins($tribFed?->piscofins?->tpRetPisCofins ?? ''),
                 'pis' => $tribFed?->piscofins?->vPis ? $this->fmt->currency($tribFed->piscofins->vPis) : '-',
                 'cofins' => $tribFed?->piscofins?->vCofins ? $this->fmt->currency($tribFed->piscofins->vCofins) : '-',
             ],
@@ -289,6 +297,23 @@ class DanfseTemplate
             }
         }
         return $hasValue ? $this->fmt->currency((string) $sum) : '-';
+    }
+
+    private function labelForTpRetPisCofins(string $tpRetPisCofins): string
+    {
+        return match (trim($tpRetPisCofins)) {
+            '0' => 'PIS/COFINS/CSLL Não Retidos',
+            '1' => 'PIS/COFINS Retido',
+            '2' => 'PIS/COFINS Não Retido',
+            '3' => 'PIS/COFINS/CSLL Retidos',
+            '4' => 'PIS/COFINS Retidos, CSLL Não Retido',
+            '5' => 'PIS Retido, COFINS/CSLL Não Retido',
+            '6' => 'COFINS Retido, PIS/CSLL Não Retido',
+            '7' => 'PIS Não Retido, COFINS/CSLL Retidos',
+            '8' => 'PIS/COFINS Não Retidos, CSLL Retido',
+            '9' => 'COFINS Não Retido, PIS/CSLL Retidos',
+            default => '-',
+        };
     }
 
     /**
