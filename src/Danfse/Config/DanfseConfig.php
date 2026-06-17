@@ -15,6 +15,7 @@ readonly class DanfseConfig
         string|false|null $logoPath = null,
         public ?MunicipalityBranding $municipality = null,
         public ?string $footerText = null,
+        public ?string $watermarkStatus = null,
     ) {
         if ($logoPath === false) {
             $this->logoDataUri = null;

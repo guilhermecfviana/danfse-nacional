@@ -16,6 +16,8 @@ class DanfseGenerator
 {
     private const OUTPUT_INLINE_STRING = 'string';
     private const OUTPUT_FILE = 'file';
+    private const WATERMARK_STATUS_CANCELADA = 'cancelada';
+    private const WATERMARK_STATUS_SUBSTITUIDA = 'substituida';
 
     /**
      * @param array<string, string> $options
@@ -65,9 +67,17 @@ class DanfseGenerator
     {
         $logoPath = realpath(__DIR__ . '/../../assets/logos/nfse.png');
         $footerText = trim($options['footerText'] ?? '');
+        $watermarkStatus = $this->normalizeWatermarkStatus($options['watermark'] ?? null);
         $config = $logoPath !== false
-            ? new DanfseConfig(logoPath: $logoPath, footerText: $footerText !== '' ? $footerText : null)
-            : new DanfseConfig(footerText: $footerText !== '' ? $footerText : null);
+            ? new DanfseConfig(
+                logoPath: $logoPath,
+                footerText: $footerText !== '' ? $footerText : null,
+                watermarkStatus: $watermarkStatus,
+            )
+            : new DanfseConfig(
+                footerText: $footerText !== '' ? $footerText : null,
+                watermarkStatus: $watermarkStatus,
+            );
 
         $rawPdf = $this->generateFromXml($xmlContent, $config);
 
@@ -89,6 +99,21 @@ class DanfseGenerator
         }
 
         return $rawPdf;
+    }
+
+    private function normalizeWatermarkStatus(mixed $status): ?string
+    {
+        if (!is_string($status)) {
+            return null;
+        }
+
+        $normalized = strtolower(trim($status));
+
+        return match ($normalized) {
+            self::WATERMARK_STATUS_CANCELADA => self::WATERMARK_STATUS_CANCELADA,
+            self::WATERMARK_STATUS_SUBSTITUIDA => self::WATERMARK_STATUS_SUBSTITUIDA,
+            default => null,
+        };
     }
 
     public function generateFromXml(string $xml, ?DanfseConfig $config = null): string

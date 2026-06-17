@@ -34,6 +34,10 @@ class DanfseTemplate
     public function render(NFSe $nfse, DanfseConfig $config): string
     {
         $data = $this->buildData($nfse);
+        $hasSubstTag = (string) ($data['nfse_subst_chave'] ?? '') !== '';
+        $resolvedWatermarkStatus = $config->watermarkStatus ?? ($hasSubstTag ? 'substituida' : null);
+        $data['watermark_status'] = $resolvedWatermarkStatus;
+        $data['watermark_text'] = $this->resolveWatermarkText((string) ($resolvedWatermarkStatus ?? ''));
         $logo = $config->logoDataUri;
         $municipality = $config->municipality;
         $qrCode = $this->generateQrCode($data['chave_acesso']);
@@ -45,6 +49,15 @@ class DanfseTemplate
         ob_start();
         include $templatePath;
         return ob_get_clean();
+    }
+
+    private function resolveWatermarkText(string $status): ?string
+    {
+        return match ($status) {
+            'cancelada' => 'CANCELADA',
+            'substituida' => 'SUBSTITUÍDA',
+            default => null,
+        };
     }
 
     private function buildFontFacesCss(): string
@@ -115,6 +128,7 @@ class DanfseTemplate
         $totTribPercent = $totTrib?->pTotTrib;
         $totTribValues = is_array($totTrib?->vTotTrib ?? null) ? $totTrib->vTotTrib : null;
         $valoresNfse = $inf?->valores;
+        $chaveSubst = trim((string) ($infDps?->subst?->chSubstda ?? ''));
 
         // Chave de acesso (remove prefixo "NFS")
         $id = $inf?->Id ?? '';
@@ -256,6 +270,7 @@ class DanfseTemplate
             ],
 
             'nbs' => trim((string) ($cServ?->cNBS ?? '')),
+            'nfse_subst_chave' => $chaveSubst,
             'informacoes_complementares' => $serv?->infoCompl?->xInfComp ?? '',
         ];
     }

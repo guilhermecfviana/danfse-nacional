@@ -19,6 +19,7 @@ $generator = new DanfseGenerator();
 $generator->generate(
     $xmlContent,
     [
+        //'watermark' => 'cancelada', // opções: 'cancelada', 'substituida'
         'output' => 'file',
         'outputPath' => $outputPath,
         'footerText' => 'Gerado por GuilhermeViana\DanfseNacional - <a href="https://github.com/guilhermecfviana/danfse-nacional">https://github.com/guilhermecfviana/danfse-nacional</a>',

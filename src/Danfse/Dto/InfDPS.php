@@ -14,6 +14,7 @@ readonly class InfDPS
         public string $dCompet = '',
         public string $tpEmit = '',
         public string $cLocEmi = '',
+        public ?Subst $subst = null,
         public ?Prestador $prest = null,
         public ?Tomador $toma = null,
         public ?Intermediario $interm = null,

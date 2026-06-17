@@ -72,8 +72,33 @@ $pdfBinaryFromString = $generator->generate((string) $xml);
 	- caminho de saida quando `output = file`
 - `footerText`
 	- texto opcional no rodape, alinhado a direita. Ex.: `Gerado pelo sistema XXXXXX - https://meusistema.com.br`
+- `watermark`
+	- define watermark de status no DANFSe:
+		- `cancelada` exibe `CANCELADA`
+		- `substituida` exibe `SUBSTITUÍDA`
+	- em ambiente de homologacao (`tpAmb = 2`), a marca `HOMOLOGAÇÃO` continua sendo exibida junto.
+	- quando o XML possuir a tag `subst/chSubstda`, a marca `SUBSTITUÍDA` e aplicada automaticamente (caso `watermark` nao seja informado).
+
+Informacoes Complementares:
+	- quando existir `subst/chSubstda`, o DANFSe exibe no topo do bloco:
+		- `NFSe Subst: {chave_de_acesso}`
+	- se houver NBS, o formato fica:
+		- `NFSe Subst: {chave_de_acesso} | NBS: {codigo_nbs}`
 - `logo`
 	- URL/caminho da logo (opcional). Por padrao usa `assets/logos/nfse.png`.
+
+Exemplo de uso com watermark:
+
+```php
+$generator->generate(
+		$xmlContent,
+		[
+				'output' => 'file',
+				'outputPath' => __DIR__ . '/saida/danfse.pdf',
+				'watermark' => 'substituida', // ou 'cancelada'
+		]
+);
+```
 
 ## API principal
 

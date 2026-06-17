@@ -71,6 +71,12 @@
             color: #000;
         }
 
+        .value.multiline-compact {
+            display: block;
+            font-size: 7pt;
+            line-height: 1.1;
+        }
+
         .single-line-ellipsis {
             display: block;
             white-space: nowrap;
@@ -138,10 +144,11 @@
             top: 0;
         }
 
-        /* Watermark para homologação */
-        .watermark {
+        /* Watermarks */
+        .watermark_homologacao,
+        .watermark_substituida,
+        .watermark_cancelada {
             position: fixed;
-            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
             font-size: 48pt;
@@ -151,11 +158,26 @@
             white-space: nowrap;
         }
 
+        .watermark_homologacao {
+            top: 58%;
+        }
+
+        .watermark_substituida,
+        .watermark_cancelada {
+            top: 44%;
+        }
+
     </style>
 </head>
 <body>
+    <?php if (($data['watermark_status'] ?? '') === 'substituida' && !empty($data['watermark_text'])): ?>
+    <div class="watermark_substituida"><?php echo $data['watermark_text']; ?></div>
+    <?php endif; ?>
+    <?php if (($data['watermark_status'] ?? '') === 'cancelada' && !empty($data['watermark_text'])): ?>
+    <div class="watermark_cancelada"><?php echo $data['watermark_text']; ?></div>
+    <?php endif; ?>
     <?php if ($data['ambiente'] == 2): ?>
-    <div class="watermark">HOMOLOGAÇÃO</div>
+    <div class="watermark_homologacao">HOMOLOGAÇÃO</div>
     <?php endif; ?>
 
     <!-- Header -->
@@ -211,20 +233,6 @@
                             A autenticidade desta NFS-e pode ser verificada pela leitura deste código QR ou pela consulta da chave de acesso no portal nacional da NFS-e
                         </div>
                     </div>
-                </td>
-            </tr>
-            <tr>
-                <td style="width: 25%;">
-                    <span class="label">Número da NFS-e</span>
-                    <span class="value"><?php echo $data['numero_nfse']; ?></span>
-                </td>
-                <td style="width: 25%;">
-                    <span class="label">Competência da NFS-e</span>
-                    <span class="value"><?php echo $data['competencia']; ?></span>
-                </td>
-                <td style="width: 25%;">
-                    <span class="label">Data e Hora da emissão da NFS-e</span>
-                    <span class="value"><?php echo $data['emissao_nfse']; ?></span>
                 </td>
             </tr>
             <tr>
@@ -431,7 +439,7 @@
             <tr>
                 <td colspan="4">
                     <span class="label">Descrição do Serviço</span>
-                    <span class="value"><?php echo $data['servico']['descricao']; ?></span>
+                    <span class="value multiline-compact"><?php echo nl2br(str_replace('\\n', "\n", (string) ($data['servico']['descricao'] ?? ''))); ?></span>
                 </td>
             </tr>
         </table>
@@ -636,9 +644,20 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="min-height: 30pt; padding: 5pt;">
-                    <?php if (($data['nbs'] ?? '') !== ''): ?>
-                    <div class="value" style="margin-bottom: 3pt;"><strong>NBS:</strong> <?php echo $data['nbs']; ?></div>
+                    <td style="min-height: 18pt; padding: 3pt 5pt;">
+                    <?php
+                    $substChave = trim((string) ($data['nfse_subst_chave'] ?? ''));
+                    $nbs = trim((string) ($data['nbs'] ?? ''));
+                    $metaParts = [];
+                    if ($substChave !== '') {
+                        $metaParts[] = '<strong>NFSe Subst:</strong> ' . $substChave;
+                    }
+                    if ($nbs !== '') {
+                        $metaParts[] = '<strong>NBS:</strong> ' . $nbs;
+                    }
+                    ?>
+                    <?php if ($metaParts !== []): ?>
+                    <div class="value multiline-compact" style="margin-bottom: 3pt;"><?php echo implode(' | ', $metaParts); ?></div>
                     <?php endif; ?>
                     <span class="value"><?php echo $data['informacoes_complementares'] !== '' ? $data['informacoes_complementares'] : ''; ?></span>
                     </td>
