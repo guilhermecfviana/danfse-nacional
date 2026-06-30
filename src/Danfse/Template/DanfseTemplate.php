@@ -211,7 +211,12 @@ class DanfseTemplate
                 '' => '-',
                 default => 'NFS-e Emitida',
             },
-            'finalidade' => '-',
+            'finalidade' => match ((string) ($infDps?->IBSCBS?->finNFSe ?? '')) {
+                '0' => 'NFS-e regular',
+                '1' => 'NFS-e de crédito',
+                '2' => 'NFS-e de débito',
+                default => '-',
+            },
 
             'emitente' => [
                 'nome' => $emit?->xNome ?? '-',

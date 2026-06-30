@@ -7,6 +7,7 @@ readonly class DpsIBSCBS
 {
     public function __construct(
         public string $cIndOp = '',
+        public string $finNFSe = '',
         public ?DpsIBSCBSValores $valores = null,
     ) {}
 }
