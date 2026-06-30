@@ -4,7 +4,7 @@ NFSe Nacional do Brasil
 Biblioteca PHP para gerar DANFSe (Documento Auxiliar da NFS-e Nacional) a partir do XML da NFS-e.
 
 # Versão
-Estamos gerando a versão 1.0 da DANFSe Nacional, em breve lançamento a versão 2.0.
+DANFSe Nacional na versão 2.0.
 
 ## Modelo de DANFSe
 
@@ -105,8 +105,3 @@ $generator->generate(
 - `DanfseGenerator::generateFromXmlFile(string $xmlPath, array $options = []): string`
 - `DanfseGenerator::generateFromXmlString(string $xmlContent, array $options = []): string`
 - `DanfseGenerator::generate(string $xmlInput, array $options = []): string`
-
-## Observacoes
-
-- O modelo oficial e usado sempre; a opcao `orientation=horizontal` nao e mais suportada.
-- A logo padrao e `assets/logos/nfse.png`, podendo ser sobrescrita via opcao `logo`.
