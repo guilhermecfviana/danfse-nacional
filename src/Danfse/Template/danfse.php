@@ -726,11 +726,11 @@
             <tr>
                 <td style="width: 25%;">
                     <span class="label">Exclusões e Reduções da Base de Cálculo</span>
-                    <span class="value">R$ <?php echo $ibs['exclusoes_reducoes']; ?></span>
+                    <span class="value"><?php echo $ibs['exclusoes_reducoes']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Base de Cálculo Após Exclusões e Reduções</span>
-                    <span class="value">R$ <?php echo $ibs['vbc']; ?></span>
+                    <span class="value"><?php echo $ibs['vbc']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Red. Alíquota IBS / Red. Alíquota CBS</span>
@@ -754,7 +754,7 @@
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Valor Apurado Municipal – IBS</span>
-                    <span class="value">R$ <?php echo $ibs['v_ibs_mun']; ?></span>
+                    <span class="value"><?php echo $ibs['v_ibs_mun']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Aliq. Efetiva Estadual – IBS</span>
@@ -762,13 +762,13 @@
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Valor Apurado Estadual – IBS</span>
-                    <span class="value">R$ <?php echo $ibs['v_ibs_uf']; ?></span>
+                    <span class="value"><?php echo $ibs['v_ibs_uf']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td style="width: 25%;">
                     <span class="label">Valor Total Apurado – IBS</span>
-                    <span class="value">R$ <?php echo $ibs['v_ibs_tot']; ?></span>
+                    <span class="value"><?php echo $ibs['v_ibs_tot']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Alíquota – CBS</span>
@@ -780,7 +780,7 @@
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Valor Total Apurado – CBS</span>
-                    <span class="value">R$ <?php echo $ibs['v_cbs']; ?></span>
+                    <span class="value"><?php echo $ibs['v_cbs']; ?></span>
                 </td>
             </tr>
         </table>
