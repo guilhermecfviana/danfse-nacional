@@ -285,30 +285,30 @@
                     </div>
                 </td>
             </tr>
-            <tr style="padding-bottom: 5pt;">
-                <td style="width: 25%; padding-bottom: 8pt;">
+            <tr>
+                <td style="width: 25%; padding-top: 8pt;">
                     <span class="label label-id">Número da NFS-e</span>
                     <span class="value"><?php echo $data['numero_nfse']; ?></span>
                 </td>
-                <td style="width: 25%; padding-bottom: 8pt;">
+                <td style="width: 25%; padding-top: 8pt;">
                     <span class="label label-id">Competência da NFS-e</span>
                     <span class="value"><?php echo $data['competencia']; ?></span>
                 </td>
-                <td style="width: 25%; padding-bottom: 8pt;">
+                <td style="width: 25%; padding-top: 8pt;">
                     <span class="label label-id">Data e Hora da emissão da NFS-e</span>
                     <span class="value"><?php echo $data['emissao_nfse']; ?></span>
                 </td>
             </tr>
             <tr>
-                <td>
+                <td style="padding-top: 4pt;">
                     <span class="label label-id">Número do DPS</span>
                     <span class="value"><?php echo $data['numero_dps']; ?></span>
                 </td>
-                <td>
+                <td style="padding-top: 4pt;">
                     <span class="label label-id">Série do DPS</span>
                     <span class="value"><?php echo $data['serie_dps']; ?></span>
                 </td>
-                <td>
+                <td style="padding-top: 4pt;">
                     <span class="label label-id">Data e Hora da emissão da DPS</span>
                     <span class="value"><?php echo $data['emissao_dps']; ?></span>
                 </td>
