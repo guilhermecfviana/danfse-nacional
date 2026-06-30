@@ -115,6 +115,22 @@ class Formatter
         return $value;
     }
 
+    public function codTribNacMun(string $nacional, string $municipal): string
+    {
+        $nac = $this->codTribNacional($nacional);
+        $mun = trim($municipal);
+
+        if ($mun === '' || $mun === '-') {
+            return $nac;
+        }
+
+        if ($nac === '' || $nac === '-') {
+            return $mun;
+        }
+
+        return $nac . ' / ' . $mun;
+    }
+
     public function limit(string $value, int $limit, string $end = '...'): string
     {
         if (mb_strlen($value) <= $limit) {

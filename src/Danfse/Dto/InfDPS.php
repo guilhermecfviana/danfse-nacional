@@ -16,6 +16,7 @@ readonly class InfDPS
         public string $cLocEmi = '',
         public ?Subst $subst = null,
         public ?Prestador $prest = null,
+        public ?DpsIBSCBS $IBSCBS = null,
         public ?Tomador $toma = null,
         public ?Intermediario $interm = null,
         public ?Servico $serv = null,

@@ -128,6 +128,10 @@ class DanfseTemplate
         $totTribPercent = $totTrib?->pTotTrib;
         $totTribValues = is_array($totTrib?->vTotTrib ?? null) ? $totTrib->vTotTrib : null;
         $valoresNfse = $inf?->valores;
+        $ibscbs = $inf?->IBSCBS;
+        $ibscbsValores = $ibscbs?->valores;
+        $totCIBS = $ibscbs?->totCIBS;
+        $dpsIbscbs = $infDps?->IBSCBS;
         $chaveSubst = trim((string) ($infDps?->subst?->chSubstda ?? ''));
 
         // Chave de acesso (remove prefixo "NFS")
@@ -143,7 +147,7 @@ class DanfseTemplate
 
         $municipioEmit = '';
         if (($inf?->xLocEmi ?? '') !== '' && ($enderEmit?->UF ?? '') !== '') {
-            $municipioEmit = ($inf->xLocEmi) . ' - ' . $enderEmit->UF;
+            $municipioEmit = ($inf->xLocEmi) . ' / ' . $enderEmit->UF;
         }
 
         // Endereço tomador
@@ -164,6 +168,29 @@ class DanfseTemplate
 
         $cepInterm = $endInterm?->endNac?->CEP ?? '';
 
+        // Totais aproximados dos tributos (percentual tem prioridade sobre valor)
+        $totTribFed = $totTribPercent?->pTotTribFed
+            ? $totTribPercent->pTotTribFed . '%'
+            : (($totTribValues['vTotTribFed'] ?? '') !== '' ? $this->fmt->currency((string) $totTribValues['vTotTribFed']) : '-');
+        $totTribEst = $totTribPercent?->pTotTribEst
+            ? $totTribPercent->pTotTribEst . '%'
+            : (($totTribValues['vTotTribEst'] ?? '') !== '' ? $this->fmt->currency((string) $totTribValues['vTotTribEst']) : '-');
+        $totTribMun = $totTribPercent?->pTotTribMun
+            ? $totTribPercent->pTotTribMun . '%'
+            : (($totTribValues['vTotTribMun'] ?? '') !== '' ? $this->fmt->currency((string) $totTribValues['vTotTribMun']) : '-');
+
+        // Texto dos Totais Aproximados dos Tributos (Lei nº 12.741/2012) para as
+        // Informações Complementares. Só é gerado quando há algum valor/percentual no XML.
+        $totaisAproxTributos = '';
+        if ($totTribFed !== '-' || $totTribEst !== '-' || $totTribMun !== '-') {
+            $totaisAproxTributos = sprintf(
+                'Totais Aproximados dos Tributos cfe. Lei nº 12.741/2012: Federais: %s; Estaduais: %s; Municipais: %s;',
+                $totTribFed,
+                $totTribEst,
+                $totTribMun,
+            );
+        }
+
         return [
             'chave_acesso' => $chaveAcesso,
             'numero_nfse' => $inf?->nNFSe ?? '-',
@@ -173,6 +200,18 @@ class DanfseTemplate
             'serie_dps' => $infDps?->serie ?? '-',
             'emissao_dps' => $this->fmt->dateTime($infDps?->dhEmi ?? ''),
             'ambiente' => (int) ($infDps?->tpAmb ?? 1),
+            'emitente_nfse' => match ((string) ($infDps?->tpEmit ?? '')) {
+                '1' => 'Prestador do Serviço',
+                '2' => 'Tomador do Serviço',
+                '3' => 'Intermediário do Serviço',
+                default => '-',
+            },
+            'situacao' => match ((string) ($inf?->cStat ?? '')) {
+                '100' => 'NFS-e Emitida',
+                '' => '-',
+                default => 'NFS-e Emitida',
+            },
+            'finalidade' => '-',
 
             'emitente' => [
                 'nome' => $emit?->xNome ?? '-',
@@ -209,32 +248,47 @@ class DanfseTemplate
                 'cep' => $this->fmt->cep($cepInterm),
             ] : null,
 
+            // Destinatário da Operação (grupo IBSCBS/dest). Ainda não modelado no DTO:
+            // null = não identificado; 'proprio' = é o próprio tomador; array = identificado.
+            'destinatario' => null,
+
             'servico' => [
                 'codigo_trib_nacional' => $this->fmt->codTribNacional($cServ?->cTribNac ?? ''),
                 'desc_trib_nacional' => $this->fmt->limit(trim($inf?->xTribNac ?? ''), 40),
                 'codigo_trib_municipal' => $cServ?->cTribMun ?? '-',
+                'codigo_trib_nac_mun' => $this->fmt->codTribNacMun($cServ?->cTribNac ?? '', $cServ?->cTribMun ?? ''),
+                'codigo_nbs' => ($cServ?->cNBS ?? '') !== '' ? $cServ->cNBS : '-',
                 'desc_trib_municipal' => $this->fmt->limit(trim($inf?->xTribMun ?? ''), 60),
+                'desc_trib_nac_mun' => trim($inf?->xTribMun ?? '') !== ''
+                    ? trim($inf->xTribMun)
+                    : (trim($inf?->xTribNac ?? '') !== '' ? trim($inf->xTribNac) : '-'),
                 'local_prestacao' => $locPrest?->cLocPrestacao ? Municipios::lookup($locPrest->cLocPrestacao) : ($inf?->xLocPrestacao ?? '-'),
+                'local_prestacao_pais' => $locPrest?->cLocPrestacao
+                    ? Municipios::lookup($locPrest->cLocPrestacao)
+                    : (($locPrest?->cPaisPrestacao ?? '') !== ''
+                        ? $locPrest->cPaisPrestacao
+                        : (($inf?->xLocPrestacao ?? '') !== '' ? $inf->xLocPrestacao : '-')),
                 'pais_prestacao' => $locPrest?->cPaisPrestacao ?? '-',
                 'descricao' => $cServ?->xDescServ ?? '-',
             ],
 
-            'tributacao_municipal' => [
-                'tributacao_issqn' => TribISSQN::labelFor($tribMun?->tribISSQN ?? ''),
-                'municipio_incidencia' => $inf?->cLocIncid ? Municipios::lookup($inf->cLocIncid) : ($inf?->xLocIncid ?? '-'),
+            'tributacao_municipal' => $tribMun !== null ? [
+                'tributacao_issqn' => TribISSQN::labelFor($tribMun->tribISSQN ?? ''),
+                'municipio_incidencia' => $inf?->cLocIncid
+                    ? Municipios::lookup($inf->cLocIncid)
+                    : (($inf?->xLocIncid ?? '') !== '' ? $inf->xLocIncid : '-'),
                 'regime_especial' => RegEspTrib::labelFor($regTrib?->regEspTrib ?? ''),
-                'valor_servico' => $this->fmt->currency($vServPrest?->vServ ?? ''),
-                'bc_issqn' => ($tribMun?->vBC ?? '') !== ''
+                'bc_issqn' => ($tribMun->vBC ?? '') !== ''
                     ? $this->fmt->currency($tribMun->vBC)
                     : ((($valoresNfse?->vBC ?? '') !== '') ? $this->fmt->currency($valoresNfse->vBC) : '-'),
-                'aliquota' => ($tribMun?->pAliq ?? '') !== ''
+                'aliquota' => ($tribMun->pAliq ?? '') !== ''
                     ? $tribMun->pAliq . '%'
                     : ((($valoresNfse?->pAliqAplic ?? '') !== '') ? $valoresNfse->pAliqAplic . '%' : '-'),
-                'retencao_issqn' => TpRetISSQN::labelFor($tribMun?->tpRetISSQN ?? ''),
-                'issqn_apurado' => ($tribMun?->vISSQN ?? '') !== ''
+                'retencao_issqn' => TpRetISSQN::labelFor($tribMun->tpRetISSQN ?? ''),
+                'issqn_apurado' => ($tribMun->vISSQN ?? '') !== ''
                     ? $this->fmt->currency($tribMun->vISSQN)
                     : ((($valoresNfse?->vISSQN ?? '') !== '') ? $this->fmt->currency($valoresNfse->vISSQN) : '-'),
-            ],
+            ] : null,
 
             'tributacao_federal' => [
                 'irrf' => $tribFed?->vRetIRRF ? $this->fmt->currency($tribFed->vRetIRRF) : '-',
@@ -253,29 +307,74 @@ class DanfseTemplate
                 'issqn_retido' => (($tribMun?->vISSQN ?? '') !== '' || (($valoresNfse?->vISSQN ?? '') !== '')) && ($tribMun?->tpRetISSQN ?? '1') !== '1'
                     ? $this->fmt->currency(($tribMun?->vISSQN ?? '') !== '' ? $tribMun->vISSQN : $valoresNfse->vISSQN)
                     : '-',
+                'total_retencoes' => ($valoresNfse?->vTotalRet ?? '') !== ''
+                    ? $this->fmt->currency($valoresNfse->vTotalRet)
+                    : $this->sumCurrency(
+                        (($tribMun?->vISSQN ?? '') !== '' || (($valoresNfse?->vISSQN ?? '') !== '')) && ($tribMun?->tpRetISSQN ?? '1') !== '1'
+                            ? (($tribMun?->vISSQN ?? '') !== '' ? $tribMun->vISSQN : ($valoresNfse?->vISSQN ?? ''))
+                            : '',
+                        $tribFed?->vRetIRRF ?? '',
+                        $tribFed?->vRetCP ?? '',
+                        $tribFed?->vRetCSLL ?? '',
+                    ),
                 'retencoes_federais' => $this->sumCurrency(
                     $tribFed?->vRetIRRF ?? '',
                     $tribFed?->vRetCP ?? '',
                     $tribFed?->vRetCSLL ?? '',
                 ),
-                'pis_cofins' => $this->sumCurrency(
-                    $tribFed?->piscofins?->vPis ?? '',
-                    $tribFed?->piscofins?->vCofins ?? '',
-                ),
                 'valor_liquido' => $this->fmt->currency($valoresNfse?->vLiq ?? ''),
+                'total_ibscbs' => $this->sumCurrency(
+                    $totCIBS?->gIBS?->vIBSTot ?? '',
+                    $totCIBS?->gCBS?->vCBS ?? '',
+                ),
+                'valor_liquido_ibscbs' => ($totCIBS?->vTotNF ?? '') !== ''
+                    ? $this->fmt->currency($totCIBS->vTotNF)
+                    : $this->fmt->currency($valoresNfse?->vLiq ?? ''),
             ],
 
             'totais_tributos' => [
-                'federais' => $totTribPercent?->pTotTribFed
-                    ? $totTribPercent->pTotTribFed . '%'
-                    : (($totTribValues['vTotTribFed'] ?? '') !== '' ? $this->fmt->currency((string) $totTribValues['vTotTribFed']) : '-'),
-                'estaduais' => $totTribPercent?->pTotTribEst
-                    ? $totTribPercent->pTotTribEst . '%'
-                    : (($totTribValues['vTotTribEst'] ?? '') !== '' ? $this->fmt->currency((string) $totTribValues['vTotTribEst']) : '-'),
-                'municipais' => $totTribPercent?->pTotTribMun
-                    ? $totTribPercent->pTotTribMun . '%'
-                    : (($totTribValues['vTotTribMun'] ?? '') !== '' ? $this->fmt->currency((string) $totTribValues['vTotTribMun']) : '-'),
+                'federais' => $totTribFed,
+                'estaduais' => $totTribEst,
+                'municipais' => $totTribMun,
             ],
+            'totais_aprox_tributos' => $totaisAproxTributos,
+
+            'municipio_emissao' => ($inf?->xLocEmi ?? '') !== '' && ($cServ?->cTribNac ?? '') !== '99'
+                ? 'Município: ' . $inf->xLocEmi . (($enderEmit?->UF ?? '') !== '' ? ' / ' . $enderEmit->UF : '')
+                : '',
+            'ambiente_gerador' => $this->labelForAmbGer($inf?->ambGer ?? ''),
+            'tipo_ambiente' => $this->labelForTpAmb((string) ($infDps?->tpAmb ?? '')),
+
+            'tributacao_ibscbs' => $ibscbs !== null ? [
+                'cst' => $dpsIbscbs?->valores?->trib?->gIBSCBS?->CST ?? '',
+                'class_trib' => $dpsIbscbs?->valores?->trib?->gIBSCBS?->cClassTrib ?? '',
+                'ind_op' => $dpsIbscbs?->cIndOp ?? '',
+                'cod_ibge_incidencia' => $ibscbs->cLocalidadeIncid,
+                'municipio_incidencia_uf' => $ibscbs->cLocalidadeIncid !== ''
+                    ? Municipios::lookup($ibscbs->cLocalidadeIncid)
+                    : $ibscbs->xLocalidadeIncid,
+                'exclusoes_reducoes' => $this->sumCurrency(
+                    $valores?->vDescCondIncond ?? '',
+                    $ibscbsValores?->vCalcReeRepRes ?? '',
+                    $valoresNfse?->vISSQN ?? '',
+                    $tribFed?->piscofins?->vPis ?? '',
+                    $tribFed?->piscofins?->vCofins ?? '',
+                ),
+                'vbc' => ($ibscbsValores?->vBC ?? '') !== '' ? $this->fmt->currency($ibscbsValores->vBC) : '-',
+                'p_red_aliq_uf' => $ibscbsValores?->uf?->pRedAliqUF ?? '',
+                'p_red_aliq_mun' => $ibscbsValores?->mun?->pRedAliqMun ?? '',
+                'p_red_aliq_cbs' => $ibscbsValores?->fed?->pRedAliqCBS ?? '',
+                'p_ibs_uf' => $ibscbsValores?->uf?->pIBSUF ?? '',
+                'p_ibs_mun' => $ibscbsValores?->mun?->pIBSMun ?? '',
+                'p_aliq_efet_mun' => ($ibscbsValores?->mun?->pAliqEfetMun ?? '') !== '' ? $ibscbsValores->mun->pAliqEfetMun . '%' : '-',
+                'v_ibs_mun' => ($totCIBS?->gIBS?->gIBSMunTot?->vIBSMun ?? '') !== '' ? $this->fmt->currency($totCIBS->gIBS->gIBSMunTot->vIBSMun) : '-',
+                'p_aliq_efet_uf' => ($ibscbsValores?->uf?->pAliqEfetUF ?? '') !== '' ? $ibscbsValores->uf->pAliqEfetUF . '%' : '-',
+                'v_ibs_uf' => ($totCIBS?->gIBS?->gIBSUFTot?->vIBSUF ?? '') !== '' ? $this->fmt->currency($totCIBS->gIBS->gIBSUFTot->vIBSUF) : '-',
+                'v_ibs_tot' => ($totCIBS?->gIBS?->vIBSTot ?? '') !== '' ? $this->fmt->currency($totCIBS->gIBS->vIBSTot) : '-',
+                'p_cbs' => ($ibscbsValores?->fed?->pCBS ?? '') !== '' ? $ibscbsValores->fed->pCBS . '%' : '-',
+                'p_aliq_efet_cbs' => ($ibscbsValores?->fed?->pAliqEfetCBS ?? '') !== '' ? $ibscbsValores->fed->pAliqEfetCBS . '%' : '-',
+                'v_cbs' => ($totCIBS?->gCBS?->vCBS ?? '') !== '' ? $this->fmt->currency($totCIBS->gCBS->vCBS) : '-',
+            ] : null,
 
             'nbs' => trim((string) ($cServ?->cNBS ?? '')),
             'nfse_subst_chave' => $chaveSubst,
@@ -297,6 +396,26 @@ class DanfseTemplate
             }
         }
         return $hasValue ? $this->fmt->currency((string) $sum) : '-';
+    }
+
+    private function labelForAmbGer(string $ambGer): string
+    {
+        return match (trim($ambGer)) {
+            '1' => '1 - Contribuinte',
+            '2' => '2 - Fisco',
+            '3' => '3 - Contribuinte c/ Fisco',
+            '4' => '4 - Terceiro',
+            default => $ambGer !== '' ? $ambGer : '-',
+        };
+    }
+
+    private function labelForTpAmb(string $tpAmb): string
+    {
+        return match (trim($tpAmb)) {
+            '1' => '1 - Produção',
+            '2' => '2 - Homologação',
+            default => $tpAmb !== '' ? $tpAmb : '-',
+        };
     }
 
     private function labelForTpRetPisCofins(string $tpRetPisCofins): string

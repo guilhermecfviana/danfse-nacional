@@ -4,7 +4,6 @@ namespace GuilhermeViana\Nfsenacional\Danfse\Data;
 
 /**
  * Mapa de municípios brasileiros indexado pelo código IBGE.
- * Dados extraídos dos arquivos disponibilizados por https://github.com/kelvins/municipios-brasileiros
  */
 final class Municipios
 {
@@ -5589,6 +5588,6 @@ final class Municipios
     {
         $code = (int) $cMun;
         $m    = self::MAP[$code] ?? null;
-        return $m !== null ? $m['nome'] . ' - ' . $m['uf'] : (string) $cMun;
+        return $m !== null ? $m['nome'] . ' / ' . $m['uf'] : (string) $cMun;
     }
 }

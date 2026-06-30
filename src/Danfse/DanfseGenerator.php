@@ -211,7 +211,7 @@ class DanfseGenerator
             $pageHeight = $canvas->get_height();
 
             $x = max(14.0, $pageWidth - 14.0 - $textWidth);
-            $y = $pageHeight - 10.0;
+            $y = $pageHeight - 12.0;
 
             $linkPos = null;
             if ($linkUrl !== null && $linkLabel !== null) {
