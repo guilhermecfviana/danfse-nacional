@@ -441,7 +441,51 @@
     <?php endif; ?>
 
     <!-- Destinatário da Operação -->
-    <?php if (is_array($data['destinatario'] ?? null)): ?>
+    <?php
+    $destinatario = $data['destinatario'] ?? null;
+    $tomador = is_array($data['tomador'] ?? null) ? $data['tomador'] : null;
+
+    $normalizeDocumento = static function ($value): string {
+        $normalized = strtoupper(trim((string) $value));
+        return preg_replace('/[^A-Z0-9]+/', '', $normalized) ?? '';
+    };
+
+    $truncateWithEllipsis = static function ($value, int $maxLength = 77): string {
+        $text = trim((string) $value);
+        if ($text === '') {
+            return '';
+        }
+
+        if ($maxLength <= 3) {
+            return str_repeat('.', max(0, $maxLength));
+        }
+
+        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+            if (mb_strlen($text, 'UTF-8') <= $maxLength) {
+                return $text;
+            }
+
+            return rtrim(mb_substr($text, 0, $maxLength - 3, 'UTF-8')) . '...';
+        }
+
+        if (strlen($text) <= $maxLength) {
+            return $text;
+        }
+
+        return rtrim(substr($text, 0, $maxLength - 3)) . '...';
+    };
+
+    $isDestinatarioProprio = false;
+    if (is_array($destinatario) && $tomador !== null) {
+        $docDestinatario = $normalizeDocumento($destinatario['cnpj_cpf'] ?? '');
+        $docTomador = $normalizeDocumento($tomador['cnpj_cpf'] ?? '');
+
+        if ($docDestinatario !== '' && $docTomador !== '' && $docDestinatario === $docTomador) {
+            $isDestinatarioProprio = true;
+        }
+    }
+    ?>
+    <?php if (is_array($destinatario) && !$isDestinatarioProprio): ?>
     <div class="bordered-section">
         <table>
             <tr>
@@ -452,40 +496,40 @@
             <tr>
                 <td style="width: 25%;">
                     <span class="label">CNPJ / CPF / NIF</span>
-                    <span class="value"><?php echo $data['destinatario']['cnpj_cpf']; ?></span>
+                    <span class="value"><?php echo $destinatario['cnpj_cpf']; ?></span>
                 </td>
                 <td style="width: 50%;">
                     <span class="label">Telefone</span>
-                    <span class="value"><?php echo $data['destinatario']['telefone']; ?></span>
+                    <span class="value"><?php echo $destinatario['telefone']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td colspan="2" style="width: 50%;">
                     <span class="label">Nome / Nome Empresarial</span>
-                    <span class="value"><?php echo $data['destinatario']['nome']; ?></span>
+                    <span class="value"><?php echo $truncateWithEllipsis($destinatario['nome'] ?? ''); ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Município / Sigla UF</span>
-                    <span class="value"><?php echo $data['destinatario']['municipio']; ?></span>
+                    <span class="value"><?php echo $destinatario['municipio']; ?></span>
                 </td>
                 <td style="width: 25%;">
                     <span class="label">Código IBGE / CEP</span>
-                    <span class="value"><?php echo $data['destinatario']['cep']; ?></span>
+                    <span class="value"><?php echo $destinatario['cep']; ?></span>
                 </td>
             </tr>
             <tr>
                 <td colspan="2" style="width: 50%;">
                     <span class="label">Endereço</span>
-                    <span class="value"><?php echo $data['destinatario']['endereco']; ?></span>
+                    <span class="value"><?php echo $truncateWithEllipsis($destinatario['endereco'] ?? ''); ?></span>
                 </td>
                 <td colspan="2" style="width: 50%;">
                     <span class="label">E-mail</span>
-                    <span class="value"><?php echo $data['destinatario']['email']; ?></span>
+                    <span class="value"><?php echo $destinatario['email']; ?></span>
                 </td>
             </tr>
         </table>
     </div>
-    <?php elseif (($data['destinatario'] ?? null) === 'proprio'): ?>
+    <?php elseif ($isDestinatarioProprio): ?>
     <div class="bordered-section" style="min-height: 0.32cm; text-align: center; font-weight: normal; font-size: 7pt; padding: 2pt;">
         O DESTINATÁRIO É O PRÓPRIO TOMADOR/ADQUIRENTE DA OPERAÇÃO
     </div>

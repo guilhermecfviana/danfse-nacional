@@ -132,6 +132,8 @@ class DanfseTemplate
         $ibscbsValores = $ibscbs?->valores;
         $totCIBS = $ibscbs?->totCIBS;
         $dpsIbscbs = $infDps?->IBSCBS;
+        $dest = $dpsIbscbs?->dest;
+        $endDest = $dest?->end;
         $chaveSubst = trim((string) ($infDps?->subst?->chSubstda ?? ''));
 
         // Chave de acesso (remove prefixo "NFS")
@@ -158,6 +160,14 @@ class DanfseTemplate
         ], fn($v) => $v !== ''));
 
         $cepToma = $endToma?->endNac?->CEP ?? '';
+        $tomadorCodigoIbgeCep = '-';
+        $tomadorIbge = $endToma?->endNac?->cMun ?? '';
+        $tomadorPostal = $cepToma !== ''
+            ? $this->fmt->cep($cepToma)
+            : (($endToma?->endExt?->cEndPost ?? '') !== '' ? $endToma->endExt->cEndPost : '');
+        if ($tomadorIbge !== '' || $tomadorPostal !== '') {
+            $tomadorCodigoIbgeCep = trim($tomadorIbge . ' / ' . $tomadorPostal, ' /');
+        }
 
         // Endereço intermediário
         $enderecoInterm = implode(', ', array_filter([
@@ -167,6 +177,46 @@ class DanfseTemplate
         ], fn($v) => $v !== ''));
 
         $cepInterm = $endInterm?->endNac?->CEP ?? '';
+        $intermediarioCodigoIbgeCep = '-';
+        $intermediarioIbge = $endInterm?->endNac?->cMun ?? '';
+        $intermediarioPostal = $cepInterm !== ''
+            ? $this->fmt->cep($cepInterm)
+            : (($endInterm?->endExt?->cEndPost ?? '') !== '' ? $endInterm->endExt->cEndPost : '');
+        if ($intermediarioIbge !== '' || $intermediarioPostal !== '') {
+            $intermediarioCodigoIbgeCep = trim($intermediarioIbge . ' / ' . $intermediarioPostal, ' /');
+        }
+
+        $emitenteCodigoIbgeCep = '-';
+        $emitenteIbge = $enderEmit?->cMun ?? '';
+        $emitentePostal = ($enderEmit?->CEP ?? '') !== '' ? $this->fmt->cep($enderEmit->CEP) : '';
+        if ($emitenteIbge !== '' || $emitentePostal !== '') {
+            $emitenteCodigoIbgeCep = trim($emitenteIbge . ' / ' . $emitentePostal, ' /');
+        }
+
+        // Endereço destinatário
+        $enderecoDest = implode(', ', array_filter([
+            $endDest?->xLgr ?? '',
+            $endDest?->nro ?? '',
+            $endDest?->xCpl ?? '',
+            $endDest?->xBairro ?? '',
+        ], fn($v) => $v !== ''));
+
+        $destMunicipio = '-';
+        if (($endDest?->endNac?->cMun ?? '') !== '') {
+            $destMunicipio = Municipios::lookup($endDest->endNac->cMun);
+        } elseif (($endDest?->endExt?->xCidade ?? '') !== '') {
+            $destMunicipio = $endDest->endExt->xCidade;
+        }
+
+        $destCodigoIbge = $endDest?->endNac?->cMun ?? '';
+        $destPostalCode = ($endDest?->endNac?->CEP ?? '') !== ''
+            ? $this->fmt->cep($endDest->endNac->CEP)
+            : (($endDest?->endExt?->cEndPost ?? '') !== '' ? $endDest->endExt->cEndPost : '');
+
+        $destCodigoIbgeCep = '-';
+        if ($destCodigoIbge !== '' || $destPostalCode !== '') {
+            $destCodigoIbgeCep = trim($destCodigoIbge . ' / ' . $destPostalCode, ' /');
+        }
 
         // Totais aproximados dos tributos (percentual tem prioridade sobre valor)
         $totTribFed = $totTribPercent?->pTotTribFed
@@ -226,7 +276,7 @@ class DanfseTemplate
                 'email' => strtolower($emit?->email ?? ''),
                 'endereco' => $enderecoEmit ?: '-',
                 'municipio' => $municipioEmit ?: '-',
-                'cep' => $this->fmt->cep($enderEmit?->CEP ?? ''),
+                'cep' => $emitenteCodigoIbgeCep,
                 'simples_nacional' => OpSimpNac::labelFor($regTrib?->opSimpNac ?? ''),
                 'regime_sn' => RegApTribSN::labelFor($regTrib?->regApTribSN ?? ''),
             ],
@@ -239,7 +289,7 @@ class DanfseTemplate
                 'email' => strtolower($toma->email),
                 'endereco' => $enderecoToma ?: '-',
                 'municipio' => $endToma?->endNac?->cMun ? Municipios::lookup($endToma->endNac->cMun) : '-',
-                'cep' => $this->fmt->cep($cepToma),
+                'cep' => $tomadorCodigoIbgeCep,
             ] : null,
 
             'intermediario' => $interm !== null ? [
@@ -250,12 +300,20 @@ class DanfseTemplate
                 'email' => strtolower($interm->email),
                 'endereco' => $enderecoInterm ?: '-',
                 'municipio' => $endInterm?->endNac?->cMun ? Municipios::lookup($endInterm->endNac->cMun) : '-',
-                'cep' => $this->fmt->cep($cepInterm),
+                'cep' => $intermediarioCodigoIbgeCep,
             ] : null,
 
-            // Destinatário da Operação (grupo IBSCBS/dest). Ainda não modelado no DTO:
-            // null = não identificado; 'proprio' = é o próprio tomador; array = identificado.
-            'destinatario' => null,
+            // Destinatário da Operação (grupo IBSCBS/dest).
+            // null = não identificado; array = identificado.
+            'destinatario' => $dest !== null ? [
+                'nome' => $dest->xNome ?: '-',
+                'cnpj_cpf' => $this->fmt->cnpjCpf($dest->documento() ?: '-'),
+                'telefone' => $this->fmt->phone($dest->fone ?: '-'),
+                'email' => trim((string) $dest->email) !== '' ? strtolower($dest->email) : '-',
+                'endereco' => $enderecoDest ?: '-',
+                'municipio' => $destMunicipio,
+                'cep' => $destCodigoIbgeCep,
+            ] : null,
 
             'servico' => [
                 'codigo_trib_nacional' => $this->fmt->codTribNacional($cServ?->cTribNac ?? ''),
