@@ -169,6 +169,13 @@ class DanfseTemplate
             $tomadorCodigoIbgeCep = trim($tomadorIbge . ' / ' . $tomadorPostal, ' /');
         }
 
+        $tomadorMunicipio = '-';
+        if (($endToma?->endNac?->cMun ?? '') !== '') {
+            $tomadorMunicipio = Municipios::lookup($endToma->endNac->cMun);
+        } elseif (($endToma?->endExt?->xCidade ?? '') !== '') {
+            $tomadorMunicipio = $endToma->endExt->xCidade;
+        }
+
         // Endereço intermediário
         $enderecoInterm = implode(', ', array_filter([
             $endInterm?->xLgr ?? '',
@@ -184,6 +191,13 @@ class DanfseTemplate
             : (($endInterm?->endExt?->cEndPost ?? '') !== '' ? $endInterm->endExt->cEndPost : '');
         if ($intermediarioIbge !== '' || $intermediarioPostal !== '') {
             $intermediarioCodigoIbgeCep = trim($intermediarioIbge . ' / ' . $intermediarioPostal, ' /');
+        }
+
+        $intermediarioMunicipio = '-';
+        if (($endInterm?->endNac?->cMun ?? '') !== '') {
+            $intermediarioMunicipio = Municipios::lookup($endInterm->endNac->cMun);
+        } elseif (($endInterm?->endExt?->xCidade ?? '') !== '') {
+            $intermediarioMunicipio = $endInterm->endExt->xCidade;
         }
 
         $emitenteCodigoIbgeCep = '-';
@@ -288,7 +302,7 @@ class DanfseTemplate
                 'telefone' => $this->fmt->phone($toma->fone),
                 'email' => strtolower($toma->email),
                 'endereco' => $enderecoToma ?: '-',
-                'municipio' => $endToma?->endNac?->cMun ? Municipios::lookup($endToma->endNac->cMun) : '-',
+                'municipio' => $tomadorMunicipio,
                 'cep' => $tomadorCodigoIbgeCep,
             ] : null,
 
@@ -299,7 +313,7 @@ class DanfseTemplate
                 'telefone' => $this->fmt->phone($interm->fone),
                 'email' => strtolower($interm->email),
                 'endereco' => $enderecoInterm ?: '-',
-                'municipio' => $endInterm?->endNac?->cMun ? Municipios::lookup($endInterm->endNac->cMun) : '-',
+                'municipio' => $intermediarioMunicipio,
                 'cep' => $intermediarioCodigoIbgeCep,
             ] : null,
 

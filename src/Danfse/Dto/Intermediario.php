@@ -12,10 +12,11 @@ readonly class Intermediario
         public ?Endereco $end = null,
         public string $fone = '',
         public string $email = '',
+        public string $NIF = '',
     ) {}
 
     public function documento(): string
     {
-        return $this->CNPJ ?: $this->CPF;
+        return $this->CNPJ ?: ($this->CPF ?: $this->NIF);
     }
 }
