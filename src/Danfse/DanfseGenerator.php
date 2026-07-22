@@ -11,6 +11,10 @@ use GuilhermeViana\Nfsenacional\Danfse\Dto\NFSe;
 use GuilhermeViana\Nfsenacional\Danfse\Template\DanfseTemplate;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use ReflectionClass;
+use ReflectionNamedType;
+use ReflectionType;
+use ReflectionUnionType;
 
 class DanfseGenerator
 {
@@ -127,6 +131,7 @@ class DanfseGenerator
     {
         $converter = new XmlToArray();
         $array = $converter->convert($xml);
+        $array = $this->normalizeForDtoArray($array, NFSe::class);
 
         $mapper = (new MapperBuilder())
             ->allowSuperfluousKeys()
@@ -134,6 +139,93 @@ class DanfseGenerator
             ->mapper();
 
         return $mapper->map(NFSe::class, $array);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function normalizeForDtoArray(array $data, string $dtoClass): array
+    {
+        if (!class_exists($dtoClass) || !$this->isDtoClass($dtoClass)) {
+            return $data;
+        }
+
+        $reflection = new ReflectionClass($dtoClass);
+        $constructor = $reflection->getConstructor();
+        if ($constructor === null) {
+            return $data;
+        }
+
+        foreach ($constructor->getParameters() as $parameter) {
+            $name = $parameter->getName();
+            if (!array_key_exists($name, $data)) {
+                continue;
+            }
+
+            $data[$name] = $this->normalizeValueForType($data[$name], $parameter->getType());
+        }
+
+        return $data;
+    }
+
+    private function normalizeValueForType(mixed $value, ?ReflectionType $type): mixed
+    {
+        if ($type === null) {
+            return $value;
+        }
+
+        if ($type instanceof ReflectionUnionType) {
+            $dtoType = null;
+            $allowsNull = false;
+
+            foreach ($type->getTypes() as $unionType) {
+                $name = $unionType->getName();
+                if ($name === 'null') {
+                    $allowsNull = true;
+                    continue;
+                }
+
+                if ($this->isDtoClass($name)) {
+                    $dtoType = $name;
+                }
+            }
+
+            if ($value === '' && $allowsNull && $dtoType !== null) {
+                return null;
+            }
+
+            if (is_array($value) && $dtoType !== null) {
+                return $this->normalizeForDtoArray($value, $dtoType);
+            }
+
+            return $value;
+        }
+
+        if (!$type instanceof ReflectionNamedType) {
+            return $value;
+        }
+
+        $typeName = $type->getName();
+        if (!$this->isDtoClass($typeName)) {
+            return $value;
+        }
+
+        if ($value === '' && $type->allowsNull()) {
+            return null;
+        }
+
+        if (is_array($value)) {
+            return $this->normalizeForDtoArray($value, $typeName);
+        }
+
+        return $value;
+    }
+
+    private function isDtoClass(string $className): bool
+    {
+        return str_starts_with($className, 'GuilhermeViana\\Nfsenacional\\Danfse\\Dto\\')
+            && class_exists($className);
     }
 
     public function generateHtml(NFSe $nfse, ?DanfseConfig $config = null): string
