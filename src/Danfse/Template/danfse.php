@@ -882,16 +882,6 @@
                 </tr>
                 <tr>
                     <td style="min-height: 18pt; padding: 3pt 5pt;">
-                    <?php
-                    $substChave = trim((string) ($data['nfse_subst_chave'] ?? ''));
-                    $metaParts = [];
-                    if ($substChave !== '') {
-                        $metaParts[] = '<strong>NFSe Subst:</strong> ' . $substChave;
-                    }
-                    ?>
-                    <?php if ($metaParts !== []): ?>
-                    <div class="value multiline-compact" style="margin-bottom: 3pt;"><?php echo implode(' | ', $metaParts); ?></div>
-                    <?php endif; ?>
                     <span class="value"><?php echo $data['informacoes_complementares'] !== '' ? $data['informacoes_complementares'] : ''; ?></span>
                     <?php if (trim((string) ($data['totais_aprox_tributos'] ?? '')) !== ''): ?>
                     <div class="value multiline-compact" style="margin-top: 3pt;"><?php echo $data['totais_aprox_tributos']; ?></div>

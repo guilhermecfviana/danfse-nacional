@@ -134,6 +134,10 @@ class DanfseTemplate
         $dpsIbscbs = $infDps?->IBSCBS;
         $dest = $dpsIbscbs?->dest;
         $endDest = $dest?->end;
+        $imovel = $dpsIbscbs?->imovel;
+        $obra = $serv?->obra;
+        $atvEvento = $serv?->atvEvento;
+        $infoCompl = $serv?->infoCompl;
         $chaveSubst = trim((string) ($infDps?->subst?->chSubstda ?? ''));
 
         // Chave de acesso (remove prefixo "NFS")
@@ -254,6 +258,33 @@ class DanfseTemplate
                 $totTribMun,
             );
         }
+
+        // Informações Complementares: união de todos os campos, na ordem definida
+        // pelo layout do DANFSe Nacional, separados por " | ". Limitado a 1997
+        // caracteres (a linha de Totais Aproximados dos Tributos é fixa e não conta
+        // nesse limite, pois é renderizada à parte).
+        $itemPed = $infoCompl?->gItemPed?->xItemPed ?? '';
+        $itemPedTexto = is_array($itemPed) ? implode(', ', $itemPed) : trim((string) $itemPed);
+
+        $infoComplPartes = [
+            'Inf. Cont.' => trim($infoCompl?->xInfComp ?? ''),
+            'NFS-e Subst.' => $chaveSubst,
+            'Doc. Ref.' => trim($infoCompl?->docRef ?? ''),
+            'Cod. Obra' => trim($obra?->cObra ?? ''),
+            'Insc. Imob.' => trim($imovel?->inscImobFisc ?? ''),
+            'Cod. Evt.' => trim($atvEvento?->idAtvEvt ?? ''),
+            'Doc. Tec.' => trim($infoCompl?->idDocTec ?? ''),
+            'Núm. Ped.' => trim($infoCompl?->xPed ?? ''),
+            'Item Ped.' => $itemPedTexto,
+            'Inf. A. T. Mun.' => trim($inf?->xOutInf ?? ''),
+        ];
+
+        $informacoesComplementares = implode(' | ', array_map(
+            fn(string $label, string $valor) => $label . ': ' . $valor,
+            array_keys(array_filter($infoComplPartes, fn(string $v) => $v !== '')),
+            array_filter($infoComplPartes, fn(string $v) => $v !== ''),
+        ));
+        $informacoesComplementares = $this->fmt->limit($informacoesComplementares, 1997);
 
         return [
             'chave_acesso' => $chaveAcesso,
@@ -455,7 +486,7 @@ class DanfseTemplate
 
             'nbs' => trim((string) ($cServ?->cNBS ?? '')),
             'nfse_subst_chave' => $chaveSubst,
-            'informacoes_complementares' => $serv?->infoCompl?->xInfComp ?? '',
+            'informacoes_complementares' => $informacoesComplementares,
         ];
     }
 

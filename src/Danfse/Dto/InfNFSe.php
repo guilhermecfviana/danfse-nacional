@@ -24,5 +24,6 @@ readonly class InfNFSe
         public ?ValoresNFSe $valores = null,
         public ?IBSCBS $IBSCBS = null,
         public ?Dps $DPS = null,
+        public string $xOutInf = '',
     ) {}
 }

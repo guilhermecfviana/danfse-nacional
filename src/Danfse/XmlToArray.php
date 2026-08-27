@@ -43,7 +43,7 @@ class XmlToArray
         // Processa filhos no namespace NFS-e
         $childCount = 0;
         foreach ($node->children(self::NFSE_NS) as $name => $child) {
-            $result[(string) $name] = $this->nodeToArray($child);
+            $this->addChild($result, (string) $name, $this->nodeToArray($child));
             $childCount++;
         }
 
@@ -51,10 +51,8 @@ class XmlToArray
         if ($childCount === 0) {
             foreach ($node->children() as $name => $child) {
                 $name = (string) $name;
-                if (!isset($result[$name])) {
-                    $result[$name] = $this->nodeToArray($child);
-                    $childCount++;
-                }
+                $this->addChild($result, $name, $this->nodeToArray($child));
+                $childCount++;
             }
         }
 
@@ -72,5 +70,26 @@ class XmlToArray
         }
 
         return $result;
+    }
+
+    /**
+     * Adiciona um filho ao array, acumulando em lista quando o nome já existe
+     * (elementos que se repetem, ex: gItemPed/xItemPed).
+     *
+     * @param array<string, mixed> $result
+     */
+    private function addChild(array &$result, string $name, mixed $value): void
+    {
+        if (!array_key_exists($name, $result)) {
+            $result[$name] = $value;
+
+            return;
+        }
+
+        if (!is_array($result[$name]) || !array_is_list($result[$name])) {
+            $result[$name] = [$result[$name]];
+        }
+
+        $result[$name][] = $value;
     }
 }

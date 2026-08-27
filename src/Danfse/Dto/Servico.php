@@ -7,6 +7,8 @@ readonly class Servico
     public function __construct(
         public ?LocPrest $locPrest = null,
         public ?CServ $cServ = null,
+        public ?Obra $obra = null,
+        public ?AtvEvento $atvEvento = null,
         public ?InfoCompl $infoCompl = null,
     ) {}
 }

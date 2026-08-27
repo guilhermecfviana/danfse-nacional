@@ -9,6 +9,7 @@ readonly class DpsIBSCBS
         public string $cIndOp = '',
         public string $finNFSe = '',
         public ?Destinatario $dest = null,
+        public ?Imovel $imovel = null,
         public ?DpsIBSCBSValores $valores = null,
     ) {}
 }
