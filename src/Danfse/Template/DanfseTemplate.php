@@ -396,6 +396,9 @@ class DanfseTemplate
                 'issqn_apurado' => ($tribMun->vISSQN ?? '') !== ''
                     ? $this->fmt->currency($tribMun->vISSQN)
                     : ((($valoresNfse?->vISSQN ?? '') !== '') ? $this->fmt->currency($valoresNfse->vISSQN) : '-'),
+                'desconto_incondicionado' => ($tribMun->vDescIncond ?: $valores?->vDescCondIncond?->vDescIncond ?? '')
+                    ? $this->fmt->currency($tribMun->vDescIncond ?: $valores?->vDescCondIncond?->vDescIncond)
+                    : '-',
             ] : null,
 
             'tributacao_federal' => [
@@ -410,8 +413,12 @@ class DanfseTemplate
 
             'totais' => [
                 'valor_servico' => $this->fmt->currency($vServPrest?->vServ ?? ''),
-                'desconto_condicionado' => $tribMun?->vDescCond ? $this->fmt->currency($tribMun->vDescCond) : '-',
-                'desconto_incondicionado' => $tribMun?->vDescIncond ? $this->fmt->currency($tribMun->vDescIncond) : '-',
+                'desconto_condicionado' => ($tribMun?->vDescCond ?: $valores?->vDescCondIncond?->vDescCond ?? '')
+                    ? $this->fmt->currency($tribMun?->vDescCond ?: $valores?->vDescCondIncond?->vDescCond)
+                    : '-',
+                'desconto_incondicionado' => ($tribMun?->vDescIncond ?: $valores?->vDescCondIncond?->vDescIncond ?? '')
+                    ? $this->fmt->currency($tribMun?->vDescIncond ?: $valores?->vDescCondIncond?->vDescIncond)
+                    : '-',
                 'issqn_retido' => (($tribMun?->vISSQN ?? '') !== '' || (($valoresNfse?->vISSQN ?? '') !== '')) && ($tribMun?->tpRetISSQN ?? '1') !== '1'
                     ? $this->fmt->currency(($tribMun?->vISSQN ?? '') !== '' ? $tribMun->vISSQN : $valoresNfse->vISSQN)
                     : '-',
@@ -440,6 +447,7 @@ class DanfseTemplate
                     : $this->fmt->currency($valoresNfse?->vLiq ?? ''),
             ],
 
+
             'totais_tributos' => [
                 'federais' => $totTribFed,
                 'estaduais' => $totTribEst,
@@ -462,7 +470,8 @@ class DanfseTemplate
                     ? Municipios::lookup($ibscbs->cLocalidadeIncid)
                     : $ibscbs->xLocalidadeIncid,
                 'exclusoes_reducoes' => $this->sumCurrency(
-                    $valores?->vDescCondIncond ?? '',
+                    $valores?->vDescCondIncond?->vDescCond ?? '',
+                    $valores?->vDescCondIncond?->vDescIncond ?? '',
                     $ibscbsValores?->vCalcReeRepRes ?? '',
                     $valoresNfse?->vISSQN ?? '',
                     $tribFed?->piscofins?->vPis ?? '',
