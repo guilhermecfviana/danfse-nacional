@@ -6,5 +6,6 @@ readonly class Imovel
 {
     public function __construct(
         public string $inscImobFisc = '',
+        public ?Endereco $end = null,
     ) {}
 }
