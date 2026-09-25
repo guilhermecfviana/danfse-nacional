@@ -34,8 +34,9 @@ class DanfseTemplate
     public function render(NFSe $nfse, DanfseConfig $config): string
     {
         $data = $this->buildData($nfse);
-        $hasSubstTag = (string) ($data['nfse_subst_chave'] ?? '') !== '';
-        $resolvedWatermarkStatus = $config->watermarkStatus ?? ($hasSubstTag ? 'substituida' : null);
+        // subst/chSubstda so existe na nota nova (substituta); a nota antiga (substituida)
+        // nao carrega essa tag, entao o watermark nunca pode ser inferido automaticamente por ela.
+        $resolvedWatermarkStatus = $config->watermarkStatus;
         $data['watermark_status'] = $resolvedWatermarkStatus;
         $data['watermark_text'] = $this->resolveWatermarkText((string) ($resolvedWatermarkStatus ?? ''));
         $logo = $config->logoDataUri;

@@ -77,7 +77,7 @@ $pdfBinaryFromString = $generator->generate((string) $xml);
 		- `cancelada` exibe `CANCELADA`
 		- `substituida` exibe `SUBSTITUÍDA`
 	- em ambiente de homologacao (`tpAmb = 2`), a marca `HOMOLOGAÇÃO` continua sendo exibida junto.
-	- quando o XML possuir a tag `subst/chSubstda`, a marca `SUBSTITUÍDA` e aplicada automaticamente (caso `watermark` nao seja informado).
+	- a tag `subst/chSubstda` so existe no XML da nota nova (substituta); a nota antiga (substituida) nao carrega essa tag, entao nao ha como inferir automaticamente qual nota deve exibir `SUBSTITUÍDA`. Informe `watermark: 'substituida'` explicitamente ao gerar o DANFSe da nota antiga.
 
 Informacoes Complementares:
 	- quando existir `subst/chSubstda`, o DANFSe exibe no topo do bloco:
